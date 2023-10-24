@@ -1,6 +1,6 @@
 import os
 import re
-import sys
+from typing import List, Dict
 import subprocess
 from pathlib import Path
 
@@ -10,8 +10,9 @@ def print_color(text, color, *args, **kargs):
 
 
 def exec_python_file(path: str, input: dict):
+    right, wrong = 0, 0
     for num, inout in input.items():
-        print_color(f"testing testcase {num}", 92)
+        print_color(f"testing testcase {num}", 96)
         p = subprocess.Popen(['python', path], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         output, _ = p.communicate(input=bytes(inout["in"], encoding='utf-8'))
         o = str(output, encoding='utf-8')
@@ -19,6 +20,13 @@ def exec_python_file(path: str, input: dict):
         print(o.strip('\n'))
         print_color("right answer:", 96)
         print(inout["out"])
+        if inout["out"] in o:
+            print_color("RIGHT", 92)
+            right += 1
+        else:
+            print_color("WRONG", 91)
+            wrong += 1
+    return round(right / (right + wrong) * 50 + 50) if right + wrong > 0 else 100
 
 
 def check_which_question(prefix: str, file: str):
@@ -86,19 +94,24 @@ for student in all_dirs:
             if n is None:
                 print_color("error", 91)
                 continue
-            exec_python_file(temp / student / i, n)
-            print_color(f"please give {question_name} score (?/100): ", 95, end="")
-            score = min(int(input()), 100)
-            student_score[question_name] = [score]
-            if score < 100:
+            score = exec_python_file(temp / student / i, n)
+            while True:
+                print_color(f"please give {question_name} score (Enter = {score}): ", 95, end="")
+                try:
+                    res_score = min(int(input()), 100)
+                except Exception:
+                    res_score = score
+                print_color(f"score: {res_score}, Yes? (Enter OK / AnyString Retry): ", 95, end="")
+                if input() == "": break
+            student_score[question_name] = [res_score]
+            if res_score < 100:
                 print_color(f"please give the reason: ", 95, end="")
                 reason = input()
                 student_score[question_name].append(reason)
             else:
                 student_score[question_name].append("")
         print_color(f"{student}: {student_score}", 94)
-        retry = input("OK? or Retry? (Enter OK / AnyString Retry): ")
-        if retry == "":
-            break
+        print("OK? or Retry? (Enter OK / AnyString Retry): ", end="")
+        if input() == "": break
 
 print(score_dict)

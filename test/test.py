@@ -1,5 +1,5 @@
-from handle_excel import ExcelIO
-from mainWindow import ScoringWindow
+from lib.handle_excel import ExcelIO
+from lib.main_window import ScoringWindow
 
 def test_excel():
     excel_cur = ExcelIO('/testopt/tst.xlsx')

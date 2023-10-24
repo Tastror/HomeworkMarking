@@ -1,54 +1,40 @@
 import os
 import re
-import subprocess
 from pathlib import Path
 
-from src.handle_excel import ExcelIO
+import lib.color as color
+from lib.subprocess import exec_python_file
+from lib.handle_excel import ExcelIO
 
 
-def print_color(text, color, *args, **kargs):
-    print(f"\033[{color}m{text}\033[0m", *args, **kargs)
-
-
-def exec_python_file(path: str, input: dict):
-    right, wrong = 0, 0
-    for num, inout in input.items():
-        print_color(f"testing testcase {num}", 96)
-        p = subprocess.Popen(['python', path], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        output, _ = p.communicate(input=bytes(inout["in"], encoding='utf-8'))
-        o = str(output, encoding='utf-8')
-        print_color("his/her input phrases and answer:", 96)
-        print(o.strip('\n'))
-        print_color("right answer:", 96)
-        print(inout["out"])
-        if inout["out"] in o:
-            print_color("RIGHT", 92)
-            right += 1
-        else:
-            print_color("WRONG", 91)
-            wrong += 1
-    return round(right / (right + wrong) * 50 + 50) if right + wrong > 0 else 100
+# preload the pattern
+filename_pattern = re.compile(r""".*?([0-9]+[a-zA-Z]*)\.py""")
+student_id_name_pattern = re.compile(r"""([0-9]+)(.*)""")
 
 
 def check_which_question(prefix: str, file: str):
-    data = re.compile(r""".*?([0-9]+[a-zA-Z]*)\.py""")
-    res = data.match(file)
+    res = filename_pattern.match(file)
     try:
-        res = prefix + res.group(1)
+        res = prefix + res.group(1).lower()
     except Exception:
         res = None
     return res
 
 
+# define and input
 temp = Path("./tmp/")
-path = input("\033[94mlab name (lab1, lab2, ...): \033[0m")
-yes_100_flag = input("\033[94m100 score skip automatically? ([y]/n): \033[0m")
+path = color.input("lab name (lab1, lab2, ...): ", color.blue)
+yes_100_flag = color.input("100 score skip automatically? ([y]/n): ", color.blue)
 yes_100_flag = False if yes_100_flag != "" and yes_100_flag.lower()[0] == "n" else True
 testcase_path = Path(f"./{path}-testcase")
+
+
+# get all files in <temp> and <testcase_path>
 _, all_dirs, _ = next(os.walk(temp))
 _, testcase_dirs, _ = next(os.walk(testcase_path))
 
-# {
+
+# testcase_dict = {
 #   testcase1: {
 #     1: {
 #       in: '123\n3456\n',
@@ -62,68 +48,102 @@ _, testcase_dirs, _ = next(os.walk(testcase_path))
 #     }
 #   },
 # }
-testcase_dict = {}
 
+# load testcase dict in <testcase_path> dirs
+testcase_dict = {}
 for testcase_name in testcase_dirs:
     r = testcase_dict[testcase_name] = {}  # r is a short alias
     _, _, files = next(os.walk(testcase_path / testcase_name))
-    for i in files:
-        num = int(Path(i).stem)
+    for filename in files:
+        num = int(Path(filename).stem)
         r.setdefault(num, {})
-        type = Path(i).suffix
+        type = Path(filename).suffix
         if type == ".in":
-            with open(testcase_path / testcase_name / i) as f:
+            with open(testcase_path / testcase_name / filename) as f:
                 r[num]["in"] = f.read() + '\n'
         elif type == ".out":
-            with open(testcase_path / testcase_name / i) as f:
+            with open(testcase_path / testcase_name / filename) as f:
                 r[num]["out"] = f.read()
         else:
-            raise ValueError(f"cannot recognize filename {testcase_path / testcase_name / i}")
+            raise ValueError(f"cannot recognize filename {testcase_path / testcase_name / filename}")
 
 
+# init excel output object
 score_dict = {}
 excelio = ExcelIO(Path(f"./result_{path}.xlsx"))
 excelio.score_excel_init(testcase_dirs)
+
+
+# if you had write some data in result_xxx.xlsx, skip them
+from_where = color.input(f"from where to begin? ([{excelio.row_num + 1}] / other int number): ", color.blue)
+from_where = excelio.row_num + 1 if from_where == "" else int(from_where)
+
+
+# loop, check and output to result_xxx.xlsx
 num = 0
 for student in all_dirs:
     num += 1
+
+    # skip lower than from_where
+    if num < from_where: continue
+
     while True:
-        print_color(f"\n[{num}] >>> now dealing {student}", 94)
+
+        # start a student, get student's files
+        color.print(f"\n[{num}] >>> now dealing {student}", color.blue)
         student_score = score_dict[student] = {}
         _, _, files = next(os.walk(temp / student))
-        for i in files:
-            question_name = check_which_question("hw", i)
-            print_color(f"get [{num}] {student} {question_name} testcase", 95)
-            n = testcase_dict.get(question_name, None)
-            if n is None:
-                print_color("error", 91)
+
+        for filename in files:
+            
+            # load data from student's file
+            question_name = check_which_question("hw", filename)
+            identify_str = f"[{num}] {student} {question_name}"
+            color.print(f"get {identify_str} testcase", color.purple)
+            some_testcases = testcase_dict.get(question_name, None)
+            if some_testcases is None:
+                color.print("error", color.red)
                 continue
-            score = exec_python_file(temp / student / i, n)
-            if yes_100_flag and score == 100:
+
+            # exec python file and test student's score
+            # rough_score may not very accurate; it's only for reference!
+            rough_score = exec_python_file(temp / student / filename, some_testcases)
+
+            # skip if yes_100_flag is True and rough_score is 100 
+            if yes_100_flag and rough_score == 100:
                 student_score[question_name] = [100, ""]
-                print_color(f"[{num}] {student} {question_name} score 100 (skip automatically)", 95)
+                color.print(f"{identify_str} rough score 100 (skip automatically)", color.purple)
                 continue
+
+            # give true score and reason (if not 100)
             while True:
-                print_color(f"please give [{num}] {student} {question_name} score (Enter = {score}): ", 95, end="")
                 try:
-                    res_score = min(int(input()), 100)
+                    res_score = min(int(color.input(f"give {identify_str} score (Enter = {rough_score}): ", color.purple)), 100)
                 except Exception:
-                    res_score = score
-                print_color(f"[{num}] {student} {question_name} score: {res_score}, Yes? (Enter OK / AnyString Retry): ", 95, end="")
-                if input() == "": break
+                    res_score = rough_score
+                if color.input(f"{identify_str} score: {res_score}, Yes? (Enter OK / AnyString Retry): ", color.purple) == "":
+                    break
             student_score[question_name] = [res_score]
             if res_score < 100:
-                print_color(f"please give the reason: ", 95, end="")
-                reason = input()
+                reason = color.input("give the reason why not 100: ", color.purple)
                 student_score[question_name].append(reason)
             else:
                 student_score[question_name].append("")
-        print_color(f"[{num}] {student}: {student_score}", 94)
-        print("OK? or Retry? (Enter OK / AnyString Retry): ", end="")
-        if input() == "": break
-    rec = re.compile(r"""([0-9]+)(.*)""")
-    res = rec.match(student)
-    excelio.score_write(res.group(2), res.group(1), 100, student_score)
-    excelio.dump()
 
-print(score_dict)
+        # end of a student, check if need to retry
+        color.print(f"[{num}] {student}: {student_score}", color.blue)
+        if color.input("OK? or Retry? (Enter OK / AnyString Retry): ") == "":
+            break
+
+    # end of a student, save to excelio
+    res = student_id_name_pattern.match(student)
+    excelio.score_write(res.group(2), res.group(1), 100, student_score)
+
+    # end of a student, excelio save to file
+    while True:
+        try:
+            excelio.dump()
+            break
+        except Exception as e:
+            color.print(e, color.RED)
+            color.input("please deal this and press enter")

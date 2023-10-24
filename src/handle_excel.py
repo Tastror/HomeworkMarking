@@ -19,7 +19,7 @@ class ExcelIO:
             self.df = pandas.DataFrame(field)
 
     def single_write(self, pos: tuple[int, str], info) -> None:
-        self.df.at(pos[0], pos[1]) = info
+        self.df.at[pos[0], pos[1]] = info
 
     def group_write(self, idx, infos, axis: int = 0) -> bool:
         match axis:

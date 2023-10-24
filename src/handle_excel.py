@@ -1,6 +1,5 @@
 import pandas
 
-
 # {
 #    姓名 : [],
 #    作业 : []
@@ -32,6 +31,6 @@ class ExcelIO:
     def append(self, group: list) -> None:
         self.df.append(group)
 
-    def dump(self, path: str, encoding: str = 'utf-8') -> None:
-        self.df.to_excel(path, encoding=encoding)    
+    def dump(self, path: str | None = None, encoding: str = 'utf-8') -> None:
+        self.df.to_excel(path if path else self._file, encoding=encoding)    
     

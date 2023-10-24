@@ -1,0 +1,6 @@
+tmp*
+lab*
+result*
+
+.vscode
+__pycache__

@@ -41,8 +41,9 @@ def check_which_question(prefix: str, file: str):
 
 
 temp = Path("./tmp/")
-excel = Path("./result_excel.xlsx")
 path = input("\033[94mlab name (lab1, lab2, ...): \033[0m")
+yes_100_flag = input("\033[94m100 score skip automatically? ([y]/n): \033[0m")
+yes_100_flag = False if yes_100_flag != "" and yes_100_flag.lower()[0] == "n" else True
 testcase_path = Path(f"./{path}-testcase")
 _, all_dirs, _ = next(os.walk(temp))
 _, testcase_dirs, _ = next(os.walk(testcase_path))
@@ -81,7 +82,7 @@ for testcase_name in testcase_dirs:
 
 
 score_dict = {}
-excelio = ExcelIO(excel)
+excelio = ExcelIO(Path(f"./result_{path}.xlsx"))
 excelio.score_excel_init(testcase_dirs)
 num = 0
 for student in all_dirs:
@@ -92,19 +93,23 @@ for student in all_dirs:
         _, _, files = next(os.walk(temp / student))
         for i in files:
             question_name = check_which_question("hw", i)
-            print_color(f"get {question_name} testcase", 95)
+            print_color(f"get [{num}] {student} {question_name} testcase", 95)
             n = testcase_dict.get(question_name, None)
             if n is None:
                 print_color("error", 91)
                 continue
             score = exec_python_file(temp / student / i, n)
+            if yes_100_flag and score == 100:
+                student_score[question_name] = [100, ""]
+                print_color(f"[{num}] {student} {question_name} score 100 (skip automatically)", 95)
+                continue
             while True:
-                print_color(f"please give {question_name} score (Enter = {score}): ", 95, end="")
+                print_color(f"please give [{num}] {student} {question_name} score (Enter = {score}): ", 95, end="")
                 try:
                     res_score = min(int(input()), 100)
                 except Exception:
                     res_score = score
-                print_color(f"score: {res_score}, Yes? (Enter OK / AnyString Retry): ", 95, end="")
+                print_color(f"[{num}] {student} {question_name} score: {res_score}, Yes? (Enter OK / AnyString Retry): ", 95, end="")
                 if input() == "": break
             student_score[question_name] = [res_score]
             if res_score < 100:
@@ -113,7 +118,7 @@ for student in all_dirs:
                 student_score[question_name].append(reason)
             else:
                 student_score[question_name].append("")
-        print_color(f"{student}: {student_score}", 94)
+        print_color(f"[{num}] {student}: {student_score}", 94)
         print("OK? or Retry? (Enter OK / AnyString Retry): ", end="")
         if input() == "": break
     rec = re.compile(r"""([0-9]+)(.*)""")

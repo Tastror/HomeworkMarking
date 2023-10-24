@@ -5,7 +5,7 @@ class ExcelIO:
         self._file = file
         self._now = 0
 
-    def excelInit(self, field: dict[str: str | list[int, str]], expect_len: int) -> None:
+    def excelInit(self, field: dict[str: str | list[int, str]], expect_len: int = 0) -> None:
             for v in field.values():
                 v = [pandas.NaN] * expect_len
             self.df = pandas.DataFrame(field)

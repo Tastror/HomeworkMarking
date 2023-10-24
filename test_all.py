@@ -1,8 +1,9 @@
 import os
 import re
-from typing import List, Dict
 import subprocess
 from pathlib import Path
+
+from src.handle_excel import ExcelIO
 
 
 def print_color(text, color, *args, **kargs):
@@ -40,6 +41,7 @@ def check_which_question(prefix: str, file: str):
 
 
 temp = Path("./tmp/")
+excel = Path("./result_excel.xlsx")
 path = input("\033[94mlab name (lab1, lab2, ...): \033[0m")
 testcase_path = Path(f"./{path}-testcase")
 _, all_dirs, _ = next(os.walk(temp))
@@ -79,7 +81,7 @@ for testcase_name in testcase_dirs:
 
 
 score_dict = {}
-
+excelio = ExcelIO(excel, len(testcase_dirs))
 num = 0
 for student in all_dirs:
     num += 1
@@ -113,5 +115,6 @@ for student in all_dirs:
         print_color(f"{student}: {student_score}", 94)
         print("OK? or Retry? (Enter OK / AnyString Retry): ", end="")
         if input() == "": break
+        excelio.append()
 
 print(score_dict)

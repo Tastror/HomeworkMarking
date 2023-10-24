@@ -3,7 +3,7 @@ from mainWindow import ScoringWindow
 
 def test_excel():
     excel_cur = ExcelIO('/testopt/tst.xlsx')
-    excel_cur.excelInit({
+    excel_cur.excel_init({
         '学号': [123, 456],
         '分数': [10, 80],
         '建议': ['no', 'hhh']

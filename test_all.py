@@ -82,7 +82,7 @@ for testcase_name in testcase_dirs:
 
 score_dict = {}
 excelio = ExcelIO(excel)
-excelio.score_excel_init(testcase_dirs, len(all_dirs))
+excelio.score_excel_init(testcase_dirs)
 num = 0
 for student in all_dirs:
     num += 1
@@ -118,7 +118,7 @@ for student in all_dirs:
         if input() == "": break
     rec = re.compile(r"""([0-9]+)(.*)""")
     res = rec.match(student)
-    excelio.score_write(res.group(2), res.group(1), "NaN", student_score)
+    excelio.score_write(res.group(2), res.group(1), 100, student_score)
     excelio.dump()
 
 print(score_dict)

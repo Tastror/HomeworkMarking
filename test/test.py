@@ -1,3 +1,7 @@
+import sys
+sys.path.append(".")
+sys.path.append("..")
+
 from lib.handle_excel import ExcelIO
 from lib.main_window import ScoringWindow
 

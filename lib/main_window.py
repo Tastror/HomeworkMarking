@@ -9,7 +9,7 @@ class ScoringWindow:
     def windowStyleInit(self):
         # 左侧文字
         self.text_left = tk.Label(self.window, text="上方文字")
-        self.text_left.pack(tk.LEFT)
+        self.text_left.pack(side=tk.LEFT)
 
         # 上方文字
         self.text_top = tk.Label(self.window, text="上方文字")

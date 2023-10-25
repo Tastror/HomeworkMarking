@@ -3,6 +3,10 @@ import subprocess
 import lib.color as color
 
 
+def show_in_vscode(path: str):
+    subprocess.Popen(['code', path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+
+
 def exec_python_file(path: str, input: dict[int, dict[str, str]]) -> int:
 
     right, wrong = 0, 0
@@ -12,7 +16,7 @@ def exec_python_file(path: str, input: dict[int, dict[str, str]]) -> int:
         color.print(f"testing testcase {num}", color.cyan)
 
         # run and get output
-        p = subprocess.Popen(['python', path], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        p = subprocess.Popen(['python', path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
         output, _ = p.communicate(input=bytes(inout["in"], encoding='utf-8'))
         o = str(output, encoding='utf-8').strip('\n')
 

@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 
 import lib.color as color
-from lib.subprocess import exec_python_file
+from lib.subprocess import exec_python_file, show_in_vscode
 from lib.handle_excel import ExcelIO
 
 
@@ -117,8 +117,12 @@ for student in all_dirs:
 
             # give true score and reason (if not 100)
             while True:
+                i = (color.input(f"give {identify_str} score (Enter = {rough_score} / number / . = show python code): ", color.purple))
+                if i == ".":
+                    show_in_vscode(temp / student / filename)
+                    continue
                 try:
-                    res_score = min(int(color.input(f"give {identify_str} score (Enter = {rough_score}): ", color.purple)), 100)
+                    res_score = min(int(i), 100)
                 except Exception:
                     res_score = rough_score
                 if color.input(f"{identify_str} score: {res_score}, Yes? (Enter OK / AnyString Retry): ", color.purple) == "":

@@ -8,7 +8,7 @@ from lib.handle_excel import ExcelIO
 
 
 # preload the pattern
-filename_pattern = re.compile(r""".*?([0-9]+[a-zA-Z]*)\.py""")
+filename_pattern = re.compile(r""".*?([0-9]+[a-zA-Z]*)\.(?:py|ipynb)""")
 student_id_name_pattern = re.compile(r"""([0-9]+)(.*)""")
 
 
@@ -118,7 +118,7 @@ for student in all_dirs:
             # give true score and reason (if not 100)
             while True:
                 i = (color.input(f"give {identify_str} score (Enter = {rough_score} / number / . = show python code): ", color.purple))
-                if i == ".":
+                if i in [".", ",", "。", "，"]:
                     show_in_vscode(temp / student / filename)
                     continue
                 try:

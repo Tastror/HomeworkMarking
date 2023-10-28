@@ -95,7 +95,7 @@ for student in all_dirs:
         _, _, files = next(os.walk(temp / student))
 
         for filename in files:
-            
+
             # load data from student's file
             question_name = check_which_question("hw", filename)
             identify_str = f"[{num}] {student} {question_name}"

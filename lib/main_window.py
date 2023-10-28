@@ -35,16 +35,16 @@ class ScoringWindow:
 
     def button_clicked(self):
         input_text = self.entry.get()
-        self.text_right.config(text="score：" + input_text)
+        self.text_right.config(text="score: " + input_text)
         self.update_text()
-        
+
     def update_text(self):
         texts = self.call()
         self.text_left = texts.get('text_left')
         self.text_right = texts.get('text_right')
         self.text_top = texts.get('text_top')
         self.text_bottom = texts.get('text_bottom')
-        
+
     def run(self):
         self.window.mainloop()
 

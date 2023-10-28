@@ -33,6 +33,6 @@ def exec_python_file(path: str, input: dict[int, dict[str, str]]) -> int:
         else:
             color.print("WRONG", color.red)
             wrong += 1
-    
+
     # get score
     return round(right / (right + wrong) * 50 + 50) if right + wrong > 0 else 100

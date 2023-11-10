@@ -129,19 +129,23 @@ class JudgeProject:
         with open(self.temp_dir_path / self.next_question_filename) as f:
             s = f.read()
             dangerous = [" os", " sys", " shutil", " pathlib", " subprocess"]
+            flag = False
             for i in dangerous:
                 if i in s:
-                    color.print("This code may be dangerous! Showing in vscode", color.red)
-                    self.show_in_vscode()
-                    while True:
-                        ready = color.input("ready to run? input 'ready' to continue, 'abort' to abort: ", color.red)
-                        if ready == "abort":
-                            color.print("abort")
-                            return 0
-                        elif ready == "ready":
-                            color.print("continue")
-                            shutil.copyfile(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
-                            break
+                    flag = True
+                    break
+            if flag:
+                color.print("This code may be dangerous! Showing in vscode", color.red)
+                self.show_in_vscode()
+                while True:
+                    ready = color.input("ready to run? input 'ready' to continue, 'abort' to abort: ", color.red)
+                    if ready == "abort":
+                        color.print("abort")
+                        return 0
+                    elif ready == "ready":
+                        color.print("continue")
+                        shutil.copyfile(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
+                        break
 
         count, right = 0, 0
 

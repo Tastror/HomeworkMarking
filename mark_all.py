@@ -5,7 +5,7 @@ from typing import TypedDict
 
 import lib.color as color
 from lib.judge import JudgeProject
-from lib.handle_excel import ExcelIO
+from lib.excel import ExcelIO
 
 
 # preload the pattern
@@ -13,12 +13,13 @@ student_id_name_pattern = re.compile(r"""([0-9]+)(.*)""")
 
 
 # define and input
-temp_extract = Path("./tmp_extract/")
 path = color.input("lab name (lab1, lab2, ...): ", color.blue)
+testcase_path = Path(f"./{path}-testcase")
+result_xlsx = Path(f"./{path}-result.xlsx")
+temp_extract = Path(f"./tmp/{path}-extract/")
+temp_judge = Path(f"./tmp/{path}-judge/")
 yes_100_flag = color.input("100 score skip automatically? ([y]/n): ", color.blue)
 yes_100_flag = False if yes_100_flag != "" and yes_100_flag.lower()[0] == "n" else True
-testcase_path = Path(f"./{path}-testcase")
-result_xlsx = Path(f"./result_{path}.xlsx")
 
 
 # get all files in <temp_extract> and <testcase_path>
@@ -27,7 +28,7 @@ _, testcase_dirs, _ = next(os.walk(testcase_path))
 
 
 # init JudgeProject
-jp = JudgeProject(testcase_path)
+jp = JudgeProject(testcase_path, temp_dir_path=temp_judge)
 
 
 # init excel output object

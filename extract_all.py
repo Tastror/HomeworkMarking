@@ -8,10 +8,10 @@ from lib.extract import extract_single_file
 
 
 # define and input
-temp_extract = Path("./tmp_extract/")
-temp_error = Path("./tmp_error.txt")
-color.print(f"{temp_extract} and {temp_error} will be overwrite (deleted), please be careful!", color.yellow)
 path = Path(color.input(f"lab name (lab1, lab2, ...): ", color.blue))
+temp_extract = Path(f"./tmp/{path}-extract/")
+temp_error = Path(f"./tmp/{path}-error.txt")
+color.print(f"{temp_extract} and {temp_error} will be overwrite (deleted), please be careful!", color.yellow)
 
 
 # get all files in <path>

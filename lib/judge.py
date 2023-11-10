@@ -24,7 +24,7 @@ class JudgeProject:
         self,
         project_testcase_dir_path: Path,
         project_input_dir_path: Optional[Path] = None,
-        temp_dir_path: Path = Path("./tmp_test/"),
+        temp_dir_path: Path = Path("./tmp/judge/"),
         ignore_case: bool = True
     ):
         """
@@ -103,7 +103,7 @@ class JudgeProject:
                 color.print(f"skip {self.project_input_dir_path / file_to_judge} since its name does not match any testcase name", color.red)
                 continue
             self.next_question_filename = file_to_judge
-            yield self.next_question_filename
+            yield Path(file_to_judge).stem
 
         self.judge_usage = False
         return "yield_judge_list() StopIter"

@@ -1,7 +1,15 @@
-tmp*
-lab*
-result*
+# data this repo will generate
+/tmp
+/*.xlsx
 
+# vscode, pycharm, python, office, etc.
+.idea
 .vscode
 __pycache__
 ~$*
+
+# you may need these as directory names
+# add more as you like
+/hw*
+/lab*
+/homework*

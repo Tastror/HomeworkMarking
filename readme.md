@@ -1,6 +1,13 @@
 # Homework Marking
 
-A little python code to judge and mark homework automatically
+A python code to judge and mark python homework automatically.
+
+## Requirements
+
+- Python >= 3.10
+- VSCode
+
+install python requirements by yourself :]
 
 ## Usage
 
@@ -29,4 +36,20 @@ homework1-testcase/
         2.py  # inner data: assert(Func(2) == 3)
 ```
 
-and use 
+Use
+
+```shell
+python extract_all.py
+```
+
+to extract zip/rar to `tmp/`.
+
+Resolve the error if has, and use
+
+```shell
+python mark_all.py
+```
+
+to mark scores. Just follow the prompt, and the result will be saved as an excel file.
+
+In `mark_all.py`, you can stop at any time you want (Ctrl + C), and start from any index you want.

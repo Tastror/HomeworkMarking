@@ -8,7 +8,7 @@ from lib.extract import extract_single_file
 
 
 # define and input
-path = Path(color.input(f"lab name (lab1, lab2, ...): ", color.blue))
+path = Path(color.input(f"input the project name (lab1, homework1, lab2, etc.): ", color.blue))
 temp_extract = Path(f"./tmp/{path}-extract/")
 temp_error = Path(f"./tmp/{path}-error.txt")
 color.print(f"{temp_extract} and {temp_error} will be overwrite (deleted), please be careful!", color.yellow)

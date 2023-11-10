@@ -13,12 +13,12 @@ student_id_name_pattern = re.compile(r"""([0-9]+)(.*)""")
 
 
 # define and input
-path = color.input("lab name (lab1, lab2, ...): ", color.blue)
+path = color.input("input the project name (lab1, homework1, lab2, etc.): ", color.blue)
 testcase_path = Path(f"./{path}-testcase")
 result_xlsx = Path(f"./{path}-result.xlsx")
 temp_extract = Path(f"./tmp/{path}-extract/")
 temp_judge = Path(f"./tmp/{path}-judge/")
-yes_100_flag = color.input("100 score skip automatically? ([y]/n): ", color.blue)
+yes_100_flag = color.input("skip 100 score automatically? ([y]/n): ", color.blue)
 yes_100_flag = False if yes_100_flag != "" and yes_100_flag.lower()[0] == "n" else True
 
 
@@ -37,7 +37,7 @@ excelio.score_excel_init(testcase_dirs)
 
 
 # if you had write some data in result_xxx.xlsx, skip them
-from_where = color.input(f"from where to begin? ([{excelio.row_num + 1}] / other int number): ", color.blue)
+from_where = color.input(f"from where (which index) to begin? ([{excelio.row_num + 1}] / other index number): ", color.blue)
 from_where = excelio.row_num + 1 if from_where == "" else int(from_where)
 
 

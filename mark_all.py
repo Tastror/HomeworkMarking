@@ -1,76 +1,37 @@
 import os
 import re
 from pathlib import Path
+from typing import TypedDict
 
 import lib.color as color
-from lib.subprocess import exec_python_file, show_in_vscode
+from lib.judge import JudgeProject
 from lib.handle_excel import ExcelIO
 
 
 # preload the pattern
-filename_pattern = re.compile(r""".*?([0-9]+[a-zA-Z]*)\.(?:py|ipynb)""")
 student_id_name_pattern = re.compile(r"""([0-9]+)(.*)""")
 
 
-def check_which_question(prefix: str, file: str):
-    res = filename_pattern.match(file)
-    try:
-        res = prefix + res.group(1).lower()
-    except Exception:
-        res = None
-    return res
-
-
 # define and input
-temp = Path("./tmp/")
+temp_extract = Path("./tmp_extract/")
 path = color.input("lab name (lab1, lab2, ...): ", color.blue)
 yes_100_flag = color.input("100 score skip automatically? ([y]/n): ", color.blue)
 yes_100_flag = False if yes_100_flag != "" and yes_100_flag.lower()[0] == "n" else True
 testcase_path = Path(f"./{path}-testcase")
+result_xlsx = Path(f"./result_{path}.xlsx")
 
 
-# get all files in <temp> and <testcase_path>
-_, all_dirs, _ = next(os.walk(temp))
+# get all files in <temp_extract> and <testcase_path>
+_, all_dirs, _ = next(os.walk(temp_extract))
 _, testcase_dirs, _ = next(os.walk(testcase_path))
 
 
-# testcase_dict = {
-#   testcase1: {
-#     1: {
-#       in: '123\n3456\n',
-#       out: '123'
-#     }
-#   },
-#   testcase2: {
-#     1: {
-#       in: '123\n21\n',
-#       out: '123'
-#     }
-#   },
-# }
-
-# load testcase dict in <testcase_path> dirs
-testcase_dict = {}
-for testcase_name in testcase_dirs:
-    r = testcase_dict[testcase_name] = {}  # r is a short alias
-    _, _, files = next(os.walk(testcase_path / testcase_name))
-    for filename in files:
-        num = int(Path(filename).stem)
-        r.setdefault(num, {})
-        type = Path(filename).suffix
-        if type == ".in":
-            with open(testcase_path / testcase_name / filename) as f:
-                r[num]["in"] = f.read() + '\n'
-        elif type == ".out":
-            with open(testcase_path / testcase_name / filename) as f:
-                r[num]["out"] = f.read()
-        else:
-            raise ValueError(f"cannot recognize filename {testcase_path / testcase_name / filename}")
+# init JudgeProject
+jp = JudgeProject(testcase_path)
 
 
 # init excel output object
-score_dict = {}
-excelio = ExcelIO(Path(f"./result_{path}.xlsx"))
+excelio = ExcelIO(result_xlsx)
 excelio.score_excel_init(testcase_dirs)
 
 
@@ -91,25 +52,18 @@ for student in all_dirs:
 
         # start a student, get student's files
         color.print(f"\n[{num}] >>> now dealing {student}", color.blue)
-        student_score = score_dict[student] = {}
-        _, _, files = next(os.walk(temp / student))
+        student_score: dict[str, list] = {}
 
-        for filename in files:
+        for question_name in jp.yield_judge_list(temp_extract / student):
 
-            # load data from student's file
-            question_name = check_which_question("hw", filename)
             identify_str = f"[{num}] {student} {question_name}"
             color.print(f"get {identify_str} testcase", color.purple)
-            some_testcases = testcase_dict.get(question_name, None)
-            if some_testcases is None:
-                color.print("error", color.red)
-                continue
 
             # exec python file and test student's score
             # rough_score may not very accurate; it's only for reference!
-            rough_score = exec_python_file(temp / student / filename, some_testcases)
+            rough_score = jp.judge()
 
-            # skip if yes_100_flag is True and rough_score is 100 
+            # skip if yes_100_flag is True and rough_score is 100
             if yes_100_flag and rough_score == 100:
                 student_score[question_name] = [100, ""]
                 color.print(f"{identify_str} rough score 100 (skip automatically)", color.purple)
@@ -119,7 +73,7 @@ for student in all_dirs:
             while True:
                 i = (color.input(f"give {identify_str} score (Enter = {rough_score} / number / . = show python code): ", color.purple))
                 if i in [".", ",", "。", "，"]:
-                    show_in_vscode(temp / student / filename)
+                    jp.show_in_vscode()
                     continue
                 try:
                     res_score = min(int(i), 100)
@@ -127,6 +81,7 @@ for student in all_dirs:
                     res_score = rough_score
                 if color.input(f"{identify_str} score: {res_score}, Yes? (Enter OK / AnyString Retry): ", color.purple) == "":
                     break
+
             student_score[question_name] = [res_score]
             if res_score < 100:
                 reason = color.input("give the reason why not 100: ", color.purple)

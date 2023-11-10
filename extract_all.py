@@ -8,9 +8,9 @@ from lib.extract import extract_single_file
 
 
 # define and input
-temp = Path("./tmp/")
+temp_extract = Path("./tmp_extract/")
 temp_error = Path("./tmp_error.txt")
-color.print(f"{temp} and {temp_error} will be overwrite (deleted), please be careful!", color.yellow)
+color.print(f"{temp_extract} and {temp_error} will be overwrite (deleted), please be careful!", color.yellow)
 path = Path(color.input(f"lab name (lab1, lab2, ...): ", color.blue))
 
 
@@ -22,8 +22,8 @@ _, _, all_files = tuple(next(os.walk(path)))
 
 
 # delete old files
-shutil.rmtree(temp, ignore_errors=True)
-temp.mkdir(parents=True, exist_ok=True)
+shutil.rmtree(temp_extract, ignore_errors=True)
+temp_extract.mkdir(parents=True, exist_ok=True)
 if os.path.exists(temp_error): os.remove(temp_error)
 
 
@@ -41,7 +41,7 @@ for filename in all_files:
     real_filename = filename.split('_')[0]
     color.print_still(f"now {num} ", color.purple)
     if not extract_single_file(
-        path=path, zipname=filename, target_path=temp, target_dir=real_filename
+        path=path, zipname=filename, target_path=temp_extract, target_dir=real_filename
     ):
         color.print(f"not a zip package: {color.underline}{path / filename}", color.bold + color.red)
         error_list.append(f"[{num}] not a zip package: {path / filename}")
@@ -51,7 +51,7 @@ for filename in all_files:
 
     # > get information inner the extracted file
     data = {"dirname": None, "dirs": [], "files": []}
-    walk_gen = os.walk(temp / real_filename)
+    walk_gen = os.walk(temp_extract / real_filename)
     _, dir_list, file_list = next(walk_gen)
 
     # > prepare data
@@ -63,9 +63,9 @@ for filename in all_files:
 
     # case (2): if is "zhangsan/zhangsan/..." and "zhangsan/__MACOSX/...", remove __MACOSX and then do (1)
     elif len(dir_list) == 2 and "__MACOSX" in dir_list and len(file_list) == 0:
-        shutil.rmtree(temp / real_filename / "__MACOSX")
+        shutil.rmtree(temp_extract / real_filename / "__MACOSX")
         data["dirname"] = dir_list[0] if dir_list[1] == "__MACOSX" else dir_list[1]
-        _, data["dirs"], data["files"] = next(os.walk(temp / real_filename / data["dirname"]))
+        _, data["dirs"], data["files"] = next(os.walk(temp_extract / real_filename / data["dirname"]))
 
     # case (3): if is already "zhangsan/1.py", continue
     else:
@@ -78,27 +78,27 @@ for filename in all_files:
         for inner_file in data["dirs"]:
             if inner_file not in [".vscode", ".idea", "__pycache__"]:
                 os.replace(
-                    temp / real_filename / data["dirname"] / inner_file,
-                    temp / real_filename / inner_file
+                    temp_extract / real_filename / data["dirname"] / inner_file,
+                    temp_extract / real_filename / inner_file
                 )
         for inner_file in data["files"]:
             os.replace(
-                temp / real_filename / data["dirname"] / inner_file,
-                temp / real_filename / inner_file
+                temp_extract / real_filename / data["dirname"] / inner_file,
+                temp_extract / real_filename / inner_file
             )
-        shutil.rmtree(temp / real_filename / data["dirname"])
+        shutil.rmtree(temp_extract / real_filename / data["dirname"])
 
     # case [2]: no inner file to move, just delete configs or caches
     else:
         for inner_file in data["dirs"]:
             if inner_file in [".vscode", ".idea", "__pycache__"]:
-                shutil.rmtree(temp / real_filename / inner_file)
+                shutil.rmtree(temp_extract / real_filename / inner_file)
 
     # > re-check
-    _, dir_contents, file_contents = next(os.walk(temp / real_filename))
+    _, dir_contents, file_contents = next(os.walk(temp_extract / real_filename))
     if len(file_contents) <= 1 or len(dir_contents) >= 1:
-        color.print(f"contents may error: {color.underline}{temp / real_filename}", color.bold + color.red)
-        error_list.append(f"[{num}] contents may error: {temp / real_filename}")
+        color.print(f"contents may error: {color.underline}{temp_extract / real_filename}", color.bold + color.red)
+        error_list.append(f"[{num}] contents may error: {temp_extract / real_filename}")
 
     # > haha, show slowly to bWe more beautiful :)
     time.sleep(0.01)

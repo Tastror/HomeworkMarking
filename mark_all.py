@@ -1,23 +1,33 @@
 import os
 import re
 from pathlib import Path
-from typing import TypedDict
 
 import lib.color as color
 from lib.judge import JudgeProject
 from lib.excel import ExcelIO
 
 
-# preload the pattern
-student_id_name_pattern = re.compile(r"""([0-9]+)(.*)""")
+# input 1/3
+project_name = ""
+while project_name == "":
+    project_name = color.input(f"input the project name (lab1, homework1, lab2, etc.): ", color.blue)
 
 
-# define and input
-path = color.input("input the project name (lab1, homework1, lab2, etc.): ", color.blue)
-testcase_path = Path(f"./{path}-testcase")
-result_xlsx = Path(f"./{path}-result.xlsx")
-temp_extract = Path(f"./tmp/{path}-extract/")
-temp_judge = Path(f"./tmp/{path}-judge/")
+# define
+student_id_name_pattern = re.compile(r"""([0-9]+)(.*)""")  # preload the pattern
+testcase_path = Path(f"./{project_name}-testcase")
+# file to generate / write
+result_xlsx = Path(f"./{project_name}-result.xlsx")
+temp_extract = Path(f"./tmp/{project_name}-extract/")
+temp_judge = Path(f"./tmp/{project_name}-judge/")
+
+
+# no file
+if not os.path.exists(testcase_path) or not os.path.isdir(testcase_path):
+    raise ValueError(f"no directory called {testcase_path}")
+
+
+# input 2/3
 yes_100_flag = color.input("skip 100 score automatically? ([y]/n): ", color.blue)
 yes_100_flag = False if yes_100_flag != "" and yes_100_flag.lower()[0] == "n" else True
 
@@ -36,6 +46,7 @@ excelio = ExcelIO(result_xlsx)
 excelio.score_excel_init(testcase_dirs)
 
 
+# input 3/3
 # if you had write some data in result_xxx.xlsx, skip them
 from_where = color.input(f"from where (which index) to begin? ([{excelio.row_num + 1}] / other index number): ", color.blue)
 from_where = excelio.row_num + 1 if from_where == "" else int(from_where)

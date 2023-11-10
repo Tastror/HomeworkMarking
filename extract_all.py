@@ -7,18 +7,28 @@ import lib.color as color
 from lib.extract import extract_single_file
 
 
-# define and input
-path = Path(color.input(f"input the project name (lab1, homework1, lab2, etc.): ", color.blue))
-temp_extract = Path(f"./tmp/{path}-extract/")
-temp_error = Path(f"./tmp/{path}-error.txt")
+# input
+project_name = ""
+while project_name == "":
+    project_name = color.input(f"input the project name (lab1, homework1, lab2, etc.): ", color.blue)
+
+
+# define
+project_file = Path(project_name)
+# file to generate / write
+temp_extract = Path(f"./tmp/{project_name}-extract/")
+temp_error = Path(f"./tmp/{project_name}-error.txt")
+
+
+# no file
+if not os.path.exists(project_file) or not os.path.isdir(project_file):
+    raise ValueError(f"no directory called {project_file}")
+
+
+# get all files in <project_file>
+color.print(f"use {project_file}/", color.blue)
 color.print(f"{temp_extract} and {temp_error} will be overwrite (deleted), please be careful!", color.yellow)
-
-
-# get all files in <path>
-color.print(f"use {path}/", color.blue)
-if not os.path.exists(path) or not os.path.isdir(path):
-    raise ValueError(f"no directory called {path}")
-_, _, all_files = tuple(next(os.walk(path)))
+_, _, all_files = tuple(next(os.walk(project_file)))
 
 
 # delete old files
@@ -33,7 +43,7 @@ num = 0
 for filename in all_files:
     num += 1
 
-    # extract all .zip, .rar, .7z files in <path>
+    # extract all .zip, .rar, .7z files in <project_file>
     # and rename them with the beginning name (name before '_'),
     #    such as "005214zhangsan_zha-123.zip" --> "005214zhangsan"
     # if error (not .zip, .rar, .7z), put into error_list and continue
@@ -41,10 +51,10 @@ for filename in all_files:
     real_filename = filename.split('_')[0]
     color.print_still(f"now {num} ", color.purple)
     if not extract_single_file(
-        path=path, zipname=filename, target_path=temp_extract, target_dir=real_filename
+        path=project_file, zipname=filename, target_path=temp_extract, target_dir=real_filename
     ):
-        color.print(f"not a zip package: {color.underline}{path / filename}", color.bold + color.red)
-        error_list.append(f"[{num}] not a zip package: {path / filename}")
+        color.print(f"not a zip package: {color.underline}{project_file / filename}", color.bold + color.red)
+        error_list.append(f"[{num}] not a zip package: {project_file / filename}")
         continue
 
     # refactor the file structure in the extracted file

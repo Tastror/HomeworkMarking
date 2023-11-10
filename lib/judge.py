@@ -125,6 +125,24 @@ class JudgeProject:
         shutil.copyfile(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
         testcase_dict = self.project_testcase_dict[Path(self.next_question_filename).stem]
 
+        # get rid of dangerous code
+        with open(self.temp_dir_path / self.next_question_filename) as f:
+            s = f.read()
+            dangerous = [" os", " sys", " shutil", " pathlib", " subprocess"]
+            for i in dangerous:
+                if i in s:
+                    color.print("This code may be dangerous! Showing in vscode", color.red)
+                    self.show_in_vscode()
+                    while True:
+                        ready = color.input("ready to run? input 'ready' to continue, 'abort' to abort: ", color.red)
+                        if ready == "abort":
+                            color.print("abort")
+                            return 0
+                        elif ready == "ready":
+                            color.print("continue")
+                            shutil.copyfile(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
+                            break
+
         count, right = 0, 0
 
         for num, testcase_data in testcase_dict.items():
@@ -161,9 +179,9 @@ class JudgeProject:
 
         # show output
         color.print("his/her input phrases and answer:", color.cyan)
-        print(o)
+        color.print(o)
         color.print("right answer:", color.cyan)
-        print(testcase_data["out"])
+        color.print(testcase_data["out"])
 
         # check if is right (use "in", very loose)
         if testcase_data["out"] in o:
@@ -193,7 +211,7 @@ class JudgeProject:
 
         if len(e) > 0:
             color.print("wrong point:", color.cyan)
-            print(e)
+            color.print(e)
             color.print("WRONG", color.red)
             return False
         else:

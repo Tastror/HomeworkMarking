@@ -81,4 +81,4 @@ print(getPrimeNum(3))
 assert(getPrimeNum(3) == 5)
 ```
 
-which will append to students' .py files and running. Judging code only fails when exception occurred (which means `assert()` failed here), and it will output both the exception (in its stderr) and the normal output (in its stdout) to your screen.
+which will append to students' .py files and running. Judging code only marks it as false when exception occurred (which means `assert()` failed here), and it will output both the exception (in its stderr) and the normal output (in its stdout) to your screen.

@@ -210,12 +210,15 @@ class JudgeProject:
 
         # run and get error only (assertion error)
         p = subprocess.Popen(['python', file_to_judge], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        _, error = p.communicate(input=bytes("0\n" * 10, encoding='utf-8'))
+        output, error = p.communicate(input=bytes("0\n" * 10, encoding='utf-8'))
+        o = str(output, encoding='utf-8').strip('\n')
         e = str(error, encoding='utf-8').strip('\n')
 
         if len(e) > 0:
             color.print("wrong point:", color.cyan)
             color.print(e)
+            color.print("output:", color.cyan)
+            color.print(o)
             color.print("WRONG", color.red)
             return False
         else:

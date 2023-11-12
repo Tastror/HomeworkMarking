@@ -116,5 +116,5 @@ for student in all_dirs:
             excelio.dump()
             break
         except Exception as e:
-            color.print(e, color.RED)
+            color.print(e, color.red)
             color.input("please deal this and press enter")

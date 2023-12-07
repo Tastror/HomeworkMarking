@@ -13,18 +13,23 @@ while project_name == "":
     project_name = color.input(f"input the project name (lab1, homework1, lab2, etc.): ", color.blue)
 
 
-# define
-student_id_name_pattern = re.compile(r"""([0-9]+)(.*)""")  # preload the pattern
-testcase_path = Path(f"./{project_name}-testcase")
-# file to generate / write
-result_xlsx = Path(f"./{project_name}-result.xlsx")
-temp_extract = Path(f"./tmp/{project_name}-extract/")
-temp_judge = Path(f"./tmp/{project_name}-judge/")
+# preload the pattern
+student_id_name_pattern = re.compile(r"""([0-9]+)(.*)""")
+
+
+# input files
+testcase_path = Path(f"./{project_name}/testcase")
+extract_dir = Path(f"./{project_name}/extract/")
+# files to generate / write
+result_xlsx = Path(f"./{project_name}/result.xlsx")
+temp_judge = Path(f"./tmp/{project_name}/judge/")
 
 
 # no file
 if not os.path.exists(testcase_path) or not os.path.isdir(testcase_path):
     raise ValueError(f"no directory called {testcase_path}")
+if not os.path.exists(extract_dir) or not os.path.isdir(extract_dir):
+    raise ValueError(f"no directory called {extract_dir}")
 
 
 # input 2/3
@@ -32,8 +37,8 @@ yes_100_flag = color.input("skip 100 score automatically? ([y]/n): ", color.blue
 yes_100_flag = False if yes_100_flag != "" and yes_100_flag.lower()[0] == "n" else True
 
 
-# get all files in <temp_extract> and <testcase_path>
-_, all_dirs, _ = next(os.walk(temp_extract))
+# get all files in <extract_dir> and <testcase_path>
+_, all_dirs, _ = next(os.walk(extract_dir))
 _, testcase_dirs, _ = next(os.walk(testcase_path))
 
 
@@ -42,7 +47,7 @@ jp = JudgeProject(testcase_path, temp_dir_path=temp_judge)
 
 
 # init excel output object
-excelio = ExcelIO(result_xlsx)
+excelio = ExcelIO(result_xlsx, append=True)
 excelio.score_excel_init(testcase_dirs)
 
 
@@ -66,7 +71,7 @@ for student in all_dirs:
         color.print(f"\n[{num}] >>> now dealing {student}", color.blue)
         student_score: dict[str, list] = {}
 
-        for question_name in jp.yield_judge_list(temp_extract / student):
+        for question_name in jp.yield_judge_list(extract_dir / student):
 
             identify_str = f"[{num}] {student} {question_name}"
             color.print(f"get {identify_str} testcase", color.purple)
@@ -83,7 +88,9 @@ for student in all_dirs:
 
             # give true score and reason (if not 100)
             while True:
-                i = (color.input(f"give {identify_str} score (Enter = {rough_score} / number / . = show python code): ", color.purple))
+                i = (color.input(f"give {identify_str} score (Enter = {rough_score} / number / . = show python code / ; = judge again): ", color.purple))
+                if i in [";", "；"]:
+                    rough_score = jp.judge()
                 if i in [".", ",", "。", "，"]:
                     jp.show_in_vscode()
                     continue

@@ -4,6 +4,7 @@ usual_print = print
 usual_input = input
 
 reset, bold, _, _, underline = tuple(f"\033[{i}m" for i in range(0, 4 + 1))
+dark_black, dark_red, dark_green, dark_yellow, dark_blue, dark_purple, dark_cyan, dark_white = tuple(f"\033[{i}m" for i in range(30, 37 + 1))
 black, red, green, yellow, blue, purple, cyan, white = tuple(f"\033[{i}m" for i in range(90, 97 + 1))
 
 
@@ -19,7 +20,7 @@ def print(text: any, color: str = reset, *args, **kargs):
     usual_print(f"{color}{text}{reset}", *args, **kargs)
 
 
-def print_there(x: int, y: int, text: any, color: str):
+def print_there(x: int, y: int, text: any, color: str = reset):
     # \033[x;yf or \033[x;yH: move to x, y
     # \0337 or \033[s: save cursor position
     # \0338 or \033[u: restore cursor position
@@ -29,10 +30,18 @@ def print_there(x: int, y: int, text: any, color: str):
     sys.stdout.flush()
 
 
-def print_still(text: any, color: str):
+def print_still(text: any, color: str = reset):
     # \033[xA: move up x chars
     # \033[xB: move down x chars
     # \033[xC: move right x chars
     # \033[xD: move left x chars
     sys.stdout.write(f"\033[{len(text)}D{color}{text}{reset}")
+    sys.stdout.flush()
+
+def print_must_still(text: any, color: str):
+    # \033[xA: move up x chars
+    # \033[xB: move down x chars
+    # \033[xC: move right x chars
+    # \033[xD: move left x chars
+    sys.stdout.write(f"\033[{9999}D{color}{text}{reset}")
     sys.stdout.flush()

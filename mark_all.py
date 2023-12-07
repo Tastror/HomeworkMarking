@@ -47,7 +47,7 @@ jp = JudgeProject(testcase_path, temp_dir_path=temp_judge)
 
 
 # init excel output object
-excelio = ExcelIO(result_xlsx, append=True)
+excelio = ExcelIO(result_xlsx)
 excelio.score_excel_init(testcase_dirs)
 
 

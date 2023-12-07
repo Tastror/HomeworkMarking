@@ -18,6 +18,7 @@ extract_dir = Path(f"./{project_name}/extract/")
 more_dir = Path(f"./more_diff/")
 # files to generate / write
 result_xlsx = Path(f"./{project_name}/diff.xlsx")
+result_count_xlsx = Path(f"./{project_name}/diff-count.xlsx")
 
 
 # no file
@@ -53,13 +54,22 @@ all_path_to_diff.extend(more_diff_path)
 
 
 # init excel output object
-excelio = ExcelIO(result_xlsx, append=False)
-excelio.diff_excel_init(all_name_to_diff)
+excelio = ExcelIO(result_xlsx)
+excelio.square_excel_init(all_name_to_diff)
 
+
+similarity_count = {}
+def count_sim(stem, data):
+    similarity_count.setdefault(stem, [0 for _ in range(12)])
+    for i in range(11):
+        if data >= 1 - 0.1 * i:
+            similarity_count[stem][i] += 1
+            break
+    similarity_count[stem][11] += 1
 
 # count all
 for i in range(len(all_path_to_diff)):
-    for j in range(i, len(all_path_to_diff)):
+    for j in range(i + 1, len(all_path_to_diff)):
 
         to_check = {}
         similarity_list = []
@@ -83,14 +93,29 @@ for i in range(len(all_path_to_diff)):
                 sm = difflib.SequenceMatcher(None, a, b)
                 similarity = sm.ratio()
                 similarity_list.append(similarity)
-                excelio.diff_write(all_name_to_diff[j], all_name_to_diff[i], stem_name, similarity)
+                excelio.write(all_name_to_diff[j], all_name_to_diff[i], stem_name, similarity)
+                count_sim(stem_name, similarity)
             except:
-                excelio.diff_write(all_name_to_diff[j], all_name_to_diff[i], stem_name, -1)
+                excelio.write(all_name_to_diff[j], all_name_to_diff[i], stem_name, -1)
 
         color.print_still(" " * (os.get_terminal_size().columns - 1))
         color.print_must_still(
             f"now {i}-{j}: {all_name_to_diff[i]}-{all_name_to_diff[j]}: {sum(similarity_list)/len(similarity_list) if len(similarity_list) > 0 else -1}",
             color.purple
         )
+
+excelio.dump()
+
+
+
+excelio = ExcelIO(result_count_xlsx)
+row_name = [f'>={1 - 0.1 * i :0.1f}' for i in range(11)]
+row_name.append('total')
+excelio.excel_init(row_name, list(similarity_count.keys()))
+
+for k, v in similarity_count.items():
+    for i in range(11):
+        excelio.write(f'>={1 - 0.1 * i :0.1f}', k, "count", v[i] if v[i] > 0 else "")
+    excelio.write('total', k, "count", v[11])
 
 excelio.dump()

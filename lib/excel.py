@@ -3,19 +3,13 @@ import pandas
 from copy import deepcopy
 
 class ExcelIO:
-    def __init__(self, file: str, append: bool):
-        """
-        Args:
-          append: only used in single sheet
-        """
-
+    def __init__(self, file: str):
         self._file = file
         self._init = False
         self._single_df = None
         self._df_sheets = None
-        self._append = append
 
-    def diff_excel_init(self, name_list: list[str]) -> None:
+    def excel_init(self, row_list: list[str], col_list: list[str]) -> None:
 
         if self._init: return
 
@@ -23,19 +17,22 @@ class ExcelIO:
         self._df_sheets = {}
 
         field = {}
-        for i in name_list:
+        for i in col_list:
             field[i] = []
         self._template_df = pandas.DataFrame(field)
         # init all cols
-        for i in name_list:
-            self._template_df.at[i, name_list[0]] = ""
+        for i in row_list:
+            self._template_df.at[i, col_list[0]] = ""
+
+    def square_excel_init(self, row_col_list: list[str]) -> None:
+        self.excel_init(row_col_list, row_col_list)
 
     def score_excel_init(self, work_list: list[str]) -> None:
 
         if self._init: return
 
         self._init = True
-        if self._append and os.path.exists(self._file):
+        if os.path.exists(self._file):
             self._single_df = pandas.read_excel(self._file, index_col=0)
             return
     
@@ -47,9 +44,9 @@ class ExcelIO:
             field[i] = []
         self._single_df = pandas.DataFrame(field)
 
-    def diff_write(self, name_1, name_2, sheet, data) -> None:
+    def write(self, row_name, col_name, sheet, data) -> None:
         self._df_sheets.setdefault(sheet, deepcopy(self._template_df))
-        self._df_sheets[sheet].at[name_1, name_2] = data
+        self._df_sheets[sheet].at[row_name, col_name] = data
 
     def score_write(self, name: str, id: int, all_score: str, score_comment_dict: dict[str, list[int, str]]) -> None:
         now_row = self.row_num

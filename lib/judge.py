@@ -115,37 +115,49 @@ class JudgeProject:
         subprocess.Popen(['code', self.project_input_dir_path / self.next_question_filename], shell=True)
 
 
-    def judge(self) -> int:
+    def judge(self, whole_files: bool = False) -> int:
 
         if not self.judge_usage:
             raise SyntaxError("this function can only be used during yield_judge_list() iter time")
 
-        shutil.rmtree(self.temp_dir_path, ignore_errors=True)
-        self.temp_dir_path.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
         testcase_dict = self.project_testcase_dict[Path(self.next_question_filename).stem]
 
-        # get rid of dangerous code
-        with open(self.temp_dir_path / self.next_question_filename) as f:
-            s = f.read()
-            dangerous = [" os", " sys", " shutil", " pathlib", " subprocess"]
-            flag = False
-            for i in dangerous:
-                if i in s:
-                    flag = True
-                    break
-            if flag:
-                color.print("This code may be dangerous! Showing in vscode", color.red)
-                self.show_in_vscode()
-                while True:
-                    ready = color.input("ready to run? input 'ready' to continue, 'abort' to abort: ", color.red)
-                    if ready == "abort":
-                        color.print("abort")
-                        return 0
-                    elif ready == "ready":
-                        color.print("continue")
-                        shutil.copyfile(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
+        shutil.rmtree(self.temp_dir_path, ignore_errors=True)
+        self.temp_dir_path.mkdir(parents=True, exist_ok=True)
+        if whole_files:
+            _, _, filenames = next(os.walk(self.project_input_dir_path))
+            for i in filenames:
+                shutil.copyfile(self.project_input_dir_path / i, self.temp_dir_path / i)
+        else:
+            shutil.copyfile(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
+
+        def get_rid_of_dangerous_code(file_path):
+            with open(file_path) as f:
+                s = f.read()
+                dangerous = [" os", " sys", " shutil", " pathlib", " subprocess"]
+                flag = False
+                for i in dangerous:
+                    if i in s:
+                        flag = True
                         break
+                if flag:
+                    color.print("This code may be dangerous! Showing in vscode", color.red)
+                    self.show_in_vscode()
+                    while True:
+                        ready = color.input("ready to run? input 'ready' to continue, 'abort' to abort: ", color.red)
+                        if ready == "abort":
+                            color.print("abort")
+                            return 0
+                        elif ready == "ready":
+                            color.print("continue")
+                            shutil.copyfile(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
+                            break
+
+        if whole_files:
+            for i in filenames:
+                get_rid_of_dangerous_code(self.temp_dir_path / i)
+        else:
+            get_rid_of_dangerous_code(self.temp_dir_path / self.next_question_filename)
 
         count, right = 0, 0
 

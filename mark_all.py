@@ -35,7 +35,8 @@ if not os.path.exists(extract_dir) or not os.path.isdir(extract_dir):
 # input 2/3
 yes_100_flag = color.input("skip 100 score automatically? ([y]/n): ", color.blue)
 yes_100_flag = False if yes_100_flag != "" and yes_100_flag.lower()[0] == "n" else True
-
+whole_flag = color.input("use whole files? (y/[n]): ", color.blue)
+whole_flag = True if whole_flag != "" and whole_flag.lower()[0] == "y" else False
 
 # get all files in <extract_dir> and <testcase_path>
 _, all_dirs, _ = next(os.walk(extract_dir))
@@ -78,7 +79,7 @@ for student in all_dirs:
 
             # exec python file and test student's score
             # rough_score may not very accurate; it's only for reference!
-            rough_score = jp.judge()
+            rough_score = jp.judge(whole_files=whole_flag)
 
             # skip if yes_100_flag is True and rough_score is 100
             if yes_100_flag and rough_score == 100:

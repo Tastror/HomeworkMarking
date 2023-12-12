@@ -92,6 +92,7 @@ for student in all_dirs:
                 i = (color.input(f"give {identify_str} score (Enter = {rough_score} / number / . = show python code / ; = judge again): ", color.purple))
                 if i in [";", "；"]:
                     rough_score = jp.judge()
+                    continue
                 if i in [".", ",", "。", "，"]:
                     jp.show_in_vscode()
                     continue

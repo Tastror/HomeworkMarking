@@ -53,7 +53,7 @@ class JudgeProject:
             r = self.project_testcase_dict[question_name]  # r is a short alias
             _, _, subtestcase_int_files = next(os.walk(self.project_testcase_dir_path / question_name))
             for subtestcase_int_name in subtestcase_int_files:
-                num = int(Path(subtestcase_int_name).stem)
+                num = Path(subtestcase_int_name).stem
                 r.setdefault(num, {})
                 suffix = Path(subtestcase_int_name).suffix
                 if suffix == ".in":

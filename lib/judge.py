@@ -132,7 +132,7 @@ class JudgeProject:
             shutil.copyfile(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
 
         def get_rid_of_dangerous_code(file_path):
-            with open(file_path) as f:
+            with open(file_path, errors='ignore') as f:
                 s = f.read()
                 dangerous = [" os", " sys", " shutil", " pathlib", " subprocess"]
                 flag = False

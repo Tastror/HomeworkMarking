@@ -74,23 +74,32 @@ for student in all_dirs:
 
         for question_name in jp.yield_judge_list(extract_dir / student):
 
+            student_score[question_name] = [100, ""]
             identify_str = f"[{num}] {student} {question_name}"
             color.print(f"get {identify_str} testcase", color.purple)
 
             # exec python file and test student's score
             # rough_score may not very accurate; it's only for reference!
-            res_score = rough_score = jp.judge(whole_files=whole_flag)
+            rough_score = jp.judge(whole_files=whole_flag)
 
             # skip if yes_100_flag is True and rough_score is 100
             if yes_100_flag and rough_score == 100:
-                student_score[question_name] = [100, ""]
+                student_score[question_name][1] = ""
                 color.print(f"{identify_str} rough score 100 (skip automatically)", color.purple)
                 continue
 
+
+            commented = False
+
             # give true score and reason (if not 100)
             while True:
-                i = (color.input(f"give {identify_str} score {rough_score} (Enter / number / . = show python code / ; = judge again): ", color.purple))
-                if i == "":
+                color.print(
+                    f"give {identify_str} score {rough_score} "
+                    "(number = change score / . = show python code / ; = judge again / c = to comment / len > 4 string = comment)",
+                    color.purple
+                )
+                i = (color.input("number / . / ; / c / string: ", color.purple))
+                if i == "c":
                     break
                 if i in [";", "；"]:
                     rough_score = jp.judge(whole_files=whole_flag)
@@ -98,17 +107,21 @@ for student in all_dirs:
                 if i in [".", ",", "。", "，"]:
                     jp.show_in_vscode()
                     continue
+                if len(i) >= 4:
+                    student_score[question_name][1] = i
+                    commented = True
+                    break
                 try:
-                    res_score = min(int(i), 100)
+                    student_score[question_name][0] = min(int(i), 100)
                 except Exception:
-                    res_score = rough_score
+                    student_score[question_name][0] = rough_score
 
-            student_score[question_name] = [res_score]
-            if res_score < 100:
-                reason = color.input("give the reason why not 100: ", color.purple)
-                student_score[question_name].append(reason)
-            else:
-                student_score[question_name].append("")
+            if not commented:
+                if student_score[question_name][0] < 100:
+                    reason = color.input("comment: ", color.purple)
+                    student_score[question_name][1] = reason
+                else:
+                    student_score[question_name][1] = ""
 
         # end of a student, check if need to retry
         color.print(f"[{num}] {student}: {student_score}", color.blue)

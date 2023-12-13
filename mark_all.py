@@ -79,7 +79,7 @@ for student in all_dirs:
 
             # exec python file and test student's score
             # rough_score may not very accurate; it's only for reference!
-            rough_score = jp.judge(whole_files=whole_flag)
+            res_score = rough_score = jp.judge(whole_files=whole_flag)
 
             # skip if yes_100_flag is True and rough_score is 100
             if yes_100_flag and rough_score == 100:
@@ -89,9 +89,11 @@ for student in all_dirs:
 
             # give true score and reason (if not 100)
             while True:
-                i = (color.input(f"give {identify_str} score (Enter = {rough_score} / number / . = show python code / ; = judge again): ", color.purple))
+                i = (color.input(f"give {identify_str} score {rough_score} (Enter / number / . = show python code / ; = judge again): ", color.purple))
+                if i == "":
+                    break
                 if i in [";", "；"]:
-                    rough_score = jp.judge()
+                    rough_score = jp.judge(whole_files=whole_flag)
                     continue
                 if i in [".", ",", "。", "，"]:
                     jp.show_in_vscode()
@@ -100,8 +102,6 @@ for student in all_dirs:
                     res_score = min(int(i), 100)
                 except Exception:
                     res_score = rough_score
-                if color.input(f"{identify_str} score: {res_score}, Yes? (Enter OK / AnyString Retry): ", color.purple) == "":
-                    break
 
             student_score[question_name] = [res_score]
             if res_score < 100:

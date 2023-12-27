@@ -75,53 +75,45 @@ for student in all_dirs:
         for question_name in jp.yield_judge_list(extract_dir / student):
 
             student_score[question_name] = [100, ""]
+            # rename
+            sq = student_score[question_name]
             identify_str = f"[{num}] {student} {question_name}"
             color.print(f"get {identify_str} testcase", color.purple)
 
             # exec python file and test student's score
-            # rough_score may not very accurate; it's only for reference!
-            rough_score = jp.judge(whole_files=whole_flag)
+            # sq[0] may not very accurate; it's only for reference!
+            sq[0] = jp.judge(whole_files=whole_flag)
 
-            # skip if yes_100_flag is True and rough_score is 100
-            if yes_100_flag and rough_score == 100:
-                student_score[question_name][1] = ""
+            # skip if yes_100_flag is True and sq[0] is 100
+            if yes_100_flag and sq[0] == 100:
+                sq[1] = ""
                 color.print(f"{identify_str} rough score 100 (skip automatically)", color.purple)
                 continue
-
-
-            commented = False
 
             # give true score and reason (if not 100)
             while True:
                 color.print(
-                    f"give {identify_str} score {rough_score} "
-                    "(number = change score / . = show python code / ; = judge again / c = to comment / len > 4 string = comment)",
+                    f"give {identify_str} score {sq[0]} "
+                    "(number = change score / . = show python code / ; = judge again / q = no comment / len >= 4 string = comment)",
                     color.purple
                 )
-                i = (color.input("number / . / ; / c / string: ", color.purple))
-                if i == "c":
+                i = (color.input("number / . / ; / q / string: ", color.purple))
+                if i == "q":
                     break
-                if i in [";", "；"]:
-                    rough_score = jp.judge(whole_files=whole_flag)
+                elif i in [";", "；"]:
+                    sq[0] = jp.judge(whole_files=whole_flag)
                     continue
-                if i in [".", ",", "。", "，"]:
+                elif i in [".", ",", "。", "，"]:
                     jp.show_in_vscode()
                     continue
-                if len(i) >= 4:
-                    student_score[question_name][1] = i
-                    commented = True
+                elif len(i) >= 4:
+                    sq[1] = i
                     break
-                try:
-                    student_score[question_name][0] = min(int(i), 100)
-                except Exception:
-                    student_score[question_name][0] = rough_score
-
-            if not commented:
-                if student_score[question_name][0] < 100:
-                    reason = color.input("comment: ", color.purple)
-                    student_score[question_name][1] = reason
                 else:
-                    student_score[question_name][1] = ""
+                    try:
+                        sq[0] = min(int(i), 100)
+                    except:
+                        pass
 
         # end of a student, check if need to retry
         color.print(f"[{num}] {student}: {student_score}", color.blue)

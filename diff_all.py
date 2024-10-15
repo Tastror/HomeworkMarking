@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 import math
 import difflib
@@ -14,11 +16,11 @@ while project_name == "":
 
 
 # input files
-extract_dir = Path(f"./{project_name}/extract/")
-more_dir = Path(f"./more_diff/")
+extract_dir = Path.cwd() / Path(f"./{project_name}/extract/")
+more_dir = Path.cwd() / Path(f"./more_diff/")
 # files to generate / write
-result_xlsx = Path(f"./{project_name}/diff.xlsx")
-result_count_xlsx = Path(f"./{project_name}/diff-count.xlsx")
+result_xlsx = Path.cwd() / Path(f"./{project_name}/diff.xlsx")
+result_count_xlsx = Path.cwd() / Path(f"./{project_name}/diff-count.xlsx")
 
 
 # no file

@@ -112,7 +112,8 @@ class JudgeProject:
     def show_in_vscode(self):
         if not self.judge_usage:
             raise SyntaxError("this function can only be used during yield_judge_list() iter time")
-        subprocess.Popen(['code', self.project_input_dir_path / self.next_question_filename], shell=True)
+        # subprocess.Popen(['code', self.project_input_dir_path / self.next_question_filename], shell=True)
+        subprocess.Popen(['code', self.project_input_dir_path / self.next_question_filename], shell=False)
 
 
     def judge(self, whole_files: bool = False) -> int:
@@ -189,19 +190,23 @@ class JudgeProject:
         testcase_data = self.project_testcase_dict[Path(self.next_question_filename).stem][num]
 
         # run and get output; error will print on the screen
-        p = subprocess.Popen(['python', file_to_judge], stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+        # p = subprocess.Popen(['python', file_to_judge], stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+        p = subprocess.Popen(['python', file_to_judge], stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=False)
         output, _ = p.communicate(input=bytes(testcase_data["in"], encoding='utf-8'))
-        o = str(output, encoding='utf-8').strip('\n')
+        o = str(output, encoding='utf-8').strip()
+        right_answer = testcase_data["out"].strip()
 
         # show output
         color.print("his/her input phrases and answer:", color.cyan)
         color.print(o)
         color.print("right answer:", color.cyan)
-        color.print(testcase_data["out"])
+        color.print(right_answer)
 
-        # check if is right (use "in", very loose)
-        if testcase_data["out"] in o:
-            color.print("RIGHT", color.green)
+        if right_answer == o:
+            color.print("TOTAL RIGHT", color.green)
+            return True
+        elif right_answer in o:
+            color.print("CONTAIN RIGHT", color.yellow)
             return True
         else:
             color.print("WRONG", color.red)
@@ -221,7 +226,8 @@ class JudgeProject:
             f.write('\n' + testcase_data["py"])
 
         # run and get error only (assertion error)
-        p = subprocess.Popen(['python', file_to_judge], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        # p = subprocess.Popen(['python', file_to_judge], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        p = subprocess.Popen(['python', file_to_judge], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
         output, error = p.communicate(input=bytes("0\n" * 10, encoding='utf-8'))
         o = str(output, encoding='utf-8').strip('\n')
         e = str(error, encoding='utf-8').strip('\n')

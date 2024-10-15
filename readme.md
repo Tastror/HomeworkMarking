@@ -9,6 +9,8 @@ A python code to judge and mark python homework automatically.
 
 install python requirements by yourself :]
 
+(patool, pandas, openpyxl, etc.)
+
 ## Usage
 
 Create 2 directories, and put the students' codes and testcases in it, like

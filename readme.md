@@ -50,7 +50,6 @@ python extract_all.py
 
 to extract `homework1/raw` to `homework1/extract/`.
 
-
 As shown above, the name of the `.zip/.rar` file must be `<id><name>_<any other suffix>`, or you can modify the name split rule in `extract_all.py`.
 
 Some students' zip files may contain invalid contents. To resolve the potential error, see `homework1/error.txt` for more information.
@@ -90,7 +89,6 @@ more_diff/
         homework2/
             question2.py
 ```
-
 
 ## Testcase
 

@@ -31,6 +31,7 @@ if not os.path.exists(project_file) or not os.path.isdir(project_file):
 color.print(f"use {project_file}/", color.blue)
 color.print(f"{extract_dir} and {error_output} will be overwrite (deleted), please be careful!", color.yellow)
 _, _, all_files = next(os.walk(project_file))
+all_files.sort()
 
 
 # delete old files
@@ -65,6 +66,8 @@ for filename in all_files:
     data = {"dirname": None, "dirs": [], "files": []}
     walk_gen = os.walk(extract_dir / real_filename)
     _, dir_list, file_list = next(walk_gen)
+    dir_list.sort()
+    file_list.sort()
 
     # > prepare data
 
@@ -72,12 +75,16 @@ for filename in all_files:
     if len(dir_list) == 1 and len(file_list) == 0:
         data["dirname"] = dir_list[0]
         _, data["dirs"], data["files"] = next(walk_gen)  # only one dir, so it is safe to use this
+        data["dirs"].sort()
+        data["files"].sort()
 
     # case (2): if is "zhangsan/zhangsan/..." and "zhangsan/__MACOSX/...", remove __MACOSX and then do (1)
     elif len(dir_list) == 2 and "__MACOSX" in dir_list and len(file_list) == 0:
         shutil.rmtree(extract_dir / real_filename / "__MACOSX")
         data["dirname"] = dir_list[0] if dir_list[1] == "__MACOSX" else dir_list[1]
         _, data["dirs"], data["files"] = next(os.walk(extract_dir / real_filename / data["dirname"]))
+        data["dirs"].sort()
+        data["files"].sort()
 
     # case (3): if is already "zhangsan/1.py", continue
     else:
@@ -108,6 +115,8 @@ for filename in all_files:
 
     # > re-check
     _, dir_contents, file_contents = next(os.walk(extract_dir / real_filename))
+    dir_contents.sort()
+    file_contents.sort()
     if len(file_contents) <= 1 or len(dir_contents) >= 1:
         color.print(f"contents may error: {color.underline}{extract_dir / real_filename}", color.bold + color.red)
         error_list.append(f"[{num}] contents may error: {extract_dir / real_filename}")

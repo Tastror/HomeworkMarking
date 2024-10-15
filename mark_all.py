@@ -42,7 +42,9 @@ whole_flag = True if whole_flag != "" and whole_flag.lower()[0] == "y" else Fals
 
 # get all files in <extract_dir> and <testcase_path>
 _, all_dirs, _ = next(os.walk(extract_dir))
+all_dirs.sort()
 _, testcase_dirs, _ = next(os.walk(testcase_path))
+testcase_dirs.sort()
 
 
 # init JudgeProject

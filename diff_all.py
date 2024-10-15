@@ -30,6 +30,7 @@ if not os.path.exists(extract_dir) or not os.path.isdir(extract_dir):
 
 # all students
 _, all_students_name, _ = next(os.walk(extract_dir))
+all_students_name.sort()
 color.print(f"{len(all_students_name)} to diff", color.blue)
 all_students_path = [extract_dir / i for i in all_students_name]
 
@@ -39,8 +40,10 @@ more_diff_name = []
 more_diff_path = []
 if os.path.exists(more_dir):
     _, all_dirs, _ = next(os.walk(more_dir))
+    all_dirs.sort()
     for d in all_dirs:
         _, homework_dirs, _ = next(os.walk(more_dir / d))
+        homework_dirs.sort()
         if project_name in homework_dirs:
             more_diff_name.append(d)
             more_diff_path.append(more_dir / d / project_name)
@@ -78,8 +81,10 @@ for i in range(len(all_path_to_diff)):
 
         # to lower
         _, _, files_i = next(os.walk(all_path_to_diff[i]))
+        files_i.sort()
         files_i_lower = [s.lower() for s in files_i]
         _, _, files_j = next(os.walk(all_path_to_diff[j]))
+        files_j.sort()
         files_j_lower = [s.lower() for s in files_j]
         for i_idx in range(len(files_i_lower)):
             if files_i_lower[i_idx] in files_j_lower:

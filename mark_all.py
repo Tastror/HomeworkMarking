@@ -98,7 +98,7 @@ for student in all_dirs:
             while True:
                 color.print(
                     f"give {identify_str} score: {sq[0]}\n"
-                    f'give {identify_str} comment: {"(empty)" if sq[1] == "" else sq[1]}\n',
+                    f'give {identify_str} comment: {"(empty)" if sq[1] == "" else sq[1]}',
                     color.purple
                 )
                 color.print(

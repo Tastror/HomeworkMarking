@@ -97,11 +97,15 @@ for student in all_dirs:
             # give true score and reason (if not 100)
             while True:
                 color.print(
-                    f"give {identify_str} score {sq[0]} "
-                    "(number = change score / . = show python code / ; = judge again / q = no comment / len >= 4 string = comment)",
+                    f"give {identify_str} score: {sq[0]}\n"
+                    f'give {identify_str} comment: {"(empty)" if sq[1] == "" else sq[1]}\n',
                     color.purple
                 )
-                i = (color.input("number / . / ; / q / string: ", color.purple))
+                color.print(
+                    "input: num -> give score  str -> give comment  . -> show python code  ; -> judge again  q -> quit)",
+                    color.yellow
+                )
+                i = (color.input("num / str / . / ; / q : ", color.yellow))
                 if i == "q":
                     break
                 elif i in [";", "；"]:

@@ -197,10 +197,10 @@ class JudgeProject:
         right_answer = testcase_data["out"].strip()
 
         # show output
-        color.print("his/her input phrases and answer:", color.cyan)
+        color.print("its output:", color.cyan)
         color.print(o)
-        color.print("right answer:", color.cyan)
-        color.print(right_answer)
+        color.print("right output:", color.cyan)
+        color.print(right_answer, color.green)
 
         if right_answer == o:
             color.print("TOTAL RIGHT", color.green)
@@ -233,9 +233,9 @@ class JudgeProject:
         e = str(error, encoding='utf-8').strip('\n')
 
         if len(e) > 0:
-            color.print("wrong point:", color.cyan)
+            color.print("its error:", color.cyan)
             color.print(e)
-            color.print("output:", color.cyan)
+            color.print("its output:", color.cyan)
             color.print(o)
             color.print("WRONG", color.red)
             return False

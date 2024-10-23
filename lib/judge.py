@@ -197,10 +197,15 @@ class JudgeProject:
         # run and get output; error will print on the screen
         # p = subprocess.Popen(['python', file_to_judge], stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
         p = subprocess.Popen(['python', file_to_judge], stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=False)
-        output, _ = p.communicate(input=bytes(testcase_data["in"], encoding='utf-8'))
-        o = str(output, encoding='utf-8').strip()
-        right_answer = testcase_data["out"].strip()
-        input_data = testcase_data["in"].strip()
+        try:
+            output, _ = p.communicate(input=bytes(testcase_data["in"], encoding='utf-8'), timeout=10)
+        except subprocess.TimeoutExpired:
+            p.kill()
+            o = "Time Limit Exceeded"
+        else:
+            o = str(output, encoding='utf-8').strip().replace('\r', '')
+        right_answer = testcase_data["out"].strip().replace('\r', '')
+        input_data = testcase_data["in"].strip().replace('\r', '')
 
         # show output
         color.print("given input:", color.cyan)
@@ -236,9 +241,15 @@ class JudgeProject:
         # run and get error only (assertion error)
         # p = subprocess.Popen(['python', file_to_judge], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         p = subprocess.Popen(['python', file_to_judge], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
-        output, error = p.communicate(input=bytes("0\n" * 10, encoding='utf-8'))
-        o = str(output, encoding='utf-8').strip('\n')
-        e = str(error, encoding='utf-8').strip('\n')
+        try:
+            output, error = p.communicate(input=bytes("0\n" * 10, encoding='utf-8'), timeout=10)
+        except subprocess.TimeoutExpired:
+            p.kill()
+            o = "Time Limit Exceeded"
+            e = "Time Limit Exceeded"
+        else:
+            o = str(output, encoding='utf-8').strip('\n')
+            e = str(error, encoding='utf-8').strip('\n')
 
         if len(e) > 0:
             color.print("its error:", color.cyan)

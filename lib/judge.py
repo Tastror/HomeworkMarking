@@ -195,8 +195,11 @@ class JudgeProject:
         output, _ = p.communicate(input=bytes(testcase_data["in"], encoding='utf-8'))
         o = str(output, encoding='utf-8').strip()
         right_answer = testcase_data["out"].strip()
+        input_data = testcase_data["in"].strip()
 
         # show output
+        color.print("given input:", color.cyan)
+        color.print(input_data)
         color.print("its output:", color.cyan)
         color.print(o)
         color.print("right output:", color.cyan)

@@ -115,10 +115,10 @@ for student in all_dirs:
                 elif i.isdigit():
                     sq[0] = int(i)
                 else:
-                    sq[1] = i                    
+                    sq[1] = i
 
         # end of a student, check if need to retry
-        color.print(f"[{num}] {student}: {student_score}", color.blue)
+        color.print(f"[{num}] {student}:\n{student_score}", color.blue)
         if color.input("OK? or Retry? (Enter OK / AnyString Retry): ") == "":
             break
 

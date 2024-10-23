@@ -5,6 +5,7 @@ import patoolib
 # (Arch) sudo pacman -S unrar
 # (Ubuntu) sudo apt install unrar
 # (Windows) winget install unrar
+# Windows 7z: https://www.7-zip.org/
 def extract_single_file(
     path: str, zipname: str, target_path: str, target_dir: str
 ):

@@ -25,7 +25,7 @@ class JudgeProject:
         project_testcase_dir_path: Path,
         project_input_dir_path: Optional[Path] = None,
         temp_dir_path: Path = Path("./tmp/judge/"),
-        ignore_case: bool = True
+        ignore_case: bool = True,
     ):
         """
         Args:
@@ -112,8 +112,13 @@ class JudgeProject:
     def show_in_vscode(self):
         if not self.judge_usage:
             raise SyntaxError("this function can only be used during yield_judge_list() iter time")
-        # subprocess.Popen(['code', self.project_input_dir_path / self.next_question_filename], shell=True)
-        subprocess.Popen(['code', self.project_input_dir_path / self.next_question_filename], shell=False)
+        try:
+            # this won't work well if you don't have code (vscode) command in your PATH
+            # while unix is more common to have code (vscode) command
+            subprocess.Popen(['code', self.project_input_dir_path / self.next_question_filename], shell=False)
+        except FileNotFoundError:
+            # this won't work well in unix, while works in windows
+            subprocess.Popen(['code', self.project_input_dir_path / self.next_question_filename], shell=True)
 
 
     def judge(self, whole_files: bool = False) -> int:

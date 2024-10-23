@@ -13,7 +13,7 @@ from lib.excel import ExcelIO
 project_name = ""
 while project_name == "":
     project_name = color.input(f"input the project name (lab1, homework1, lab2, etc.): ", color.blue)
-
+print(project_name)
 
 # preload the pattern
 student_id_name_pattern = re.compile(r"""([0-9]+)(.*)""")
@@ -37,8 +37,10 @@ if not os.path.exists(extract_dir) or not os.path.isdir(extract_dir):
 # input 2/3
 yes_100_flag = color.input("skip 100 score automatically? ([y]/n): ", color.blue)
 yes_100_flag = False if yes_100_flag != "" and yes_100_flag.lower()[0] == "n" else True
+print(yes_100_flag)
 whole_flag = color.input("use whole files? (y/[n]): ", color.blue)
 whole_flag = True if whole_flag != "" and whole_flag.lower()[0] == "y" else False
+print(whole_flag)
 
 # get all files in <extract_dir> and <testcase_path>
 _, all_dirs, _ = next(os.walk(extract_dir))
@@ -60,6 +62,7 @@ excelio.score_excel_init(testcase_dirs)
 # if you had write some data in result_xxx.xlsx, skip them
 from_where = color.input(f"from where (which index) to begin? ([{excelio.row_num + 1}] / other index number): ", color.blue)
 from_where = excelio.row_num + 1 if from_where == "" else int(from_where)
+print(from_where)
 
 
 # loop, check and output to result_xxx.xlsx

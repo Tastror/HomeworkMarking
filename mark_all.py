@@ -106,18 +106,12 @@ for student in all_dirs:
                     break
                 elif i in [";", "；"]:
                     sq[0] = jp.judge(whole_files=whole_flag)
-                    continue
                 elif i in [".", ",", "。", "，"]:
                     jp.show_in_vscode()
-                    continue
-                elif len(i) >= 4:
-                    sq[1] = i
-                    break
+                elif i.isdigit():
+                    sq[0] = int(i)
                 else:
-                    try:
-                        sq[0] = min(int(i), 100)
-                    except:
-                        pass
+                    sq[1] = i                    
 
         # end of a student, check if need to retry
         color.print(f"[{num}] {student}: {student_score}", color.blue)

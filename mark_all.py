@@ -122,7 +122,7 @@ for student in all_dirs:
 
         # end of a student, check if need to retry
         color.print(f"[{num}] {student}:\n{student_score}", color.blue)
-        if color.input("OK? or Retry? (Enter OK / AnyString Retry): ") == "":
+        if color.input("OK? or Retry? (just enter -> OK / input any string -> Retry): ") == "":
             break
 
     # end of a student, save to excelio

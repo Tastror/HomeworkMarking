@@ -117,6 +117,8 @@ for student in all_dirs:
                     jp.show_in_vscode()
                 elif i.isdigit():
                     sq[0] = int(i)
+                elif i == "":
+                    pass
                 else:
                     sq[1] = i
 

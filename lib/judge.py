@@ -95,6 +95,7 @@ class JudgeProject:
             raise ValueError(f"did not specify project_input_dir_path")
 
         _, _, files_to_judge = next(os.walk(self.project_input_dir_path))
+        files_to_judge.sort()
 
         for file_to_judge in files_to_judge:
             if self.ignore_case:

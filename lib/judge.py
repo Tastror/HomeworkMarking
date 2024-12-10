@@ -45,6 +45,7 @@ class JudgeProject:
         self.next_question_filename = ""
 
         _, question_dirs, _ = next(os.walk(self.project_testcase_dir_path))
+        question_dirs.sort()
 
         for question_name in question_dirs:
             if self.ignore_case:
@@ -52,6 +53,7 @@ class JudgeProject:
             self.project_testcase_dict[question_name] = {}
             r = self.project_testcase_dict[question_name]  # r is a short alias
             _, _, subtestcase_int_files = next(os.walk(self.project_testcase_dir_path / question_name))
+            subtestcase_int_files.sort()
             for subtestcase_int_name in subtestcase_int_files:
                 num = Path(subtestcase_int_name).stem
                 r.setdefault(num, {})
@@ -133,6 +135,7 @@ class JudgeProject:
         self.temp_dir_path.mkdir(parents=True, exist_ok=True)
         if whole_files:
             _, _, filenames = next(os.walk(self.project_input_dir_path))
+            filenames.sort()
             for i in filenames:
                 shutil.copyfile(self.project_input_dir_path / i, self.temp_dir_path / i)
         else:

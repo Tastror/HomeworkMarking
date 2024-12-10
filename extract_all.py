@@ -40,6 +40,10 @@ extract_dir.mkdir(parents=True, exist_ok=True)
 if os.path.exists(error_output): os.remove(error_output)
 
 
+# not used files
+not_used_files = [".vscode", ".idea", "__pycache__", "__MACOSX", "Thumbs.db", ".DS_Store"]
+
+
 # extract all
 error_list = []
 num = 0
@@ -95,7 +99,7 @@ for filename in all_files:
     # case [1]: move inner files, except configs or caches, and delete inner files
     if data["dirname"] is not None:
         for inner_file in data["dirs"]:
-            if inner_file not in [".vscode", ".idea", "__pycache__", "__MACOSX"]:
+            if inner_file not in not_used_files:
                 os.replace(
                     extract_dir / real_filename / data["dirname"] / inner_file,
                     extract_dir / real_filename / inner_file
@@ -110,7 +114,7 @@ for filename in all_files:
     # case [2]: no inner file to move, just delete configs or caches
     else:
         for inner_file in data["dirs"]:
-            if inner_file in [".vscode", ".idea", "__pycache__", "__MACOSX"]:
+            if inner_file in not_used_files:
                 shutil.rmtree(extract_dir / real_filename / inner_file)
 
     # > re-check

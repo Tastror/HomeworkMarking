@@ -105,7 +105,7 @@ for student in all_dirs:
                     color.purple
                 )
                 color.print(
-                    "input: num -> give score  str -> give comment  . -> show python code  ; -> judge again  q -> quit)",
+                    "input: num -> give score / str -> give comment / . -> show python code / ; -> judge again / q -> quit",
                     color.yellow
                 )
                 i = (color.input("num / str / . / ; / q : ", color.yellow))
@@ -124,7 +124,18 @@ for student in all_dirs:
 
         # end of a student, check if need to retry
         color.print(f"[{num}] {student}:\n{student_score}", color.blue)
-        if color.input("OK? or Retry? (just enter -> OK / input any string -> Retry): ") == "":
+
+        break_flag = False
+        while True:
+            r = color.input("OK / Retry (o -> OK / r -> Retry): ")
+            if r == "o":
+                break_flag = True
+                break
+            elif r == "r":
+                break
+            else:
+                pass
+        if break_flag:
             break
 
     # end of a student, save to excelio

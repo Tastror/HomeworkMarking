@@ -79,13 +79,13 @@ for i in range(len(all_path_to_diff)):
 
         # to lower
         files_i = list_sorted_files(all_path_to_diff[i])
-        files_i_lower = [s.lower() for s in files_i]
+        files_i_stem_lower = [very_stem(s.lower()) for s in files_i]
         files_j = list_sorted_files(all_path_to_diff[j])
-        files_j_lower = [s.lower() for s in files_j]
-        for i_idx in range(len(files_i_lower)):
-            if files_i_lower[i_idx] in files_j_lower:
-                j_idx = files_j_lower.index(files_i_lower[i_idx])
-                to_check.setdefault(very_stem(files_i_lower[i_idx]), (files_i[i_idx], files_j[j_idx]))
+        files_j_stem_lower = [very_stem(s.lower()) for s in files_j]
+        for i_idx in range(len(files_i_stem_lower)):
+            if files_i_stem_lower[i_idx] in files_j_stem_lower:
+                j_idx = files_j_stem_lower.index(files_i_stem_lower[i_idx])
+                to_check.setdefault(files_i_stem_lower[i_idx], (files_i[i_idx], files_j[j_idx]))
 
         for stem_name, file_name_tuple in to_check.items():
             try:

@@ -19,7 +19,7 @@ class ExcelIO:
         field = {}
         for i in col_list:
             field[i] = []
-        self._template_df = pandas.DataFrame(field)
+        self._template_df = pandas.DataFrame(field, dtype=object)
         # init all cols
         for i in row_list:
             self._template_df.at[i, col_list[0]] = ""

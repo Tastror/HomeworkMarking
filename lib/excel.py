@@ -59,7 +59,7 @@ class ExcelIO:
         if self._single_df is None:
             writer = pandas.ExcelWriter(self._file)
             for k, v in self._df_sheets.items():
-                v.to_excel(writer, k)
+                v.to_excel(excel_writer=writer, sheet_name=k)
             writer._save()
         elif self._df_sheets is None:
             self._single_df.to_excel(self._file)

@@ -7,6 +7,7 @@ from pathlib import Path
 import lib.color as color
 from lib.judge import JudgeProject
 from lib.excel import ExcelIO
+from lib.path import list_sorted_dirs
 
 
 # input 1/3
@@ -43,10 +44,8 @@ whole_flag = True if whole_flag != "" and whole_flag.lower()[0] == "y" else Fals
 print(whole_flag)
 
 # get all files in <extract_dir> and <testcase_path>
-_, all_dirs, _ = next(os.walk(extract_dir))
-all_dirs.sort()
-_, testcase_dirs, _ = next(os.walk(testcase_path))
-testcase_dirs.sort()
+all_dirs = list_sorted_dirs(extract_dir)
+testcase_dirs = list_sorted_dirs(testcase_path)
 
 
 # init JudgeProject
@@ -60,7 +59,7 @@ excelio.score_excel_init(testcase_dirs)
 
 # input 3/3
 # if you had write some data in result_xxx.xlsx, skip them
-from_where = color.input(f"from where (which index) to begin? ([{excelio.row_num + 1}] / other index number): ", color.blue)
+from_where = color.input(f"from where (which index) to begin? ([{excelio.row_num + 1}] / other index number) in {len(all_dirs)} students: ", color.blue)
 from_where = excelio.row_num + 1 if from_where == "" else int(from_where)
 print(from_where)
 

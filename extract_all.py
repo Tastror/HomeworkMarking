@@ -6,6 +6,7 @@ import shutil
 from pathlib import Path
 
 import lib.color as color
+from lib.path import list_sorted_files, list_sorted_daf
 from lib.extract import extract_single_file
 
 
@@ -30,8 +31,7 @@ if not os.path.exists(project_file) or not os.path.isdir(project_file):
 # get all files in <project_file>
 color.print(f"use {project_file}/", color.blue)
 color.print(f"{extract_dir} and {error_output} will be overwrite (deleted), please be careful!", color.yellow)
-_, _, all_files = next(os.walk(project_file))
-all_files.sort()
+all_files = list_sorted_files(project_file)
 
 
 # delete old files
@@ -67,28 +67,21 @@ for filename in all_files:
     # refactor the file structure in the extracted file
 
     # > get information inner the extracted file
-    data = {"dirname": None, "dirs": [], "files": []}
-    walk_gen = os.walk(extract_dir / real_filename)
-    _, dir_list, file_list = next(walk_gen)
-    dir_list.sort()
-    file_list.sort()
+    data = {"compress": None, "dirs": [], "files": []}
+    dir_list, file_list = list_sorted_daf(extract_dir / real_filename)
 
     # > prepare data
 
     # case (1): prepare to move inner file such as "zhangsan/zhangsan/1.py" to outer "zhangsan/1.py"
     if len(dir_list) == 1 and len(file_list) == 0:
-        data["dirname"] = dir_list[0]
-        _, data["dirs"], data["files"] = next(walk_gen)  # only one dir, so it is safe to use this
-        data["dirs"].sort()
-        data["files"].sort()
+        data["compress"] = dir_list[0]
+        data["dirs"], data["files"] = list_sorted_daf(extract_dir / real_filename / data["compress"])
 
     # case (2): if is "zhangsan/zhangsan/..." and "zhangsan/__MACOSX/...", remove __MACOSX and then do (1)
     elif len(dir_list) == 2 and "__MACOSX" in dir_list and len(file_list) == 0:
         shutil.rmtree(extract_dir / real_filename / "__MACOSX")
-        data["dirname"] = dir_list[0] if dir_list[1] == "__MACOSX" else dir_list[1]
-        _, data["dirs"], data["files"] = next(os.walk(extract_dir / real_filename / data["dirname"]))
-        data["dirs"].sort()
-        data["files"].sort()
+        data["compress"] = dir_list[0] if dir_list[1] == "__MACOSX" else dir_list[1]
+        data["dirs"], data["files"] = list_sorted_daf(extract_dir / real_filename / data["compress"])
 
     # case (3): if is already "zhangsan/1.py", continue
     else:
@@ -96,36 +89,34 @@ for filename in all_files:
 
     # > move and delete files
 
-    # case [1]: move inner files, except configs or caches, and delete inner files
-    if data["dirname"] is not None:
+    # case (1)(2): move inner files, except configs or caches, and delete inner files
+    if data["compress"] is not None:
         for inner_file in data["dirs"]:
             if inner_file not in not_used_files:
                 os.replace(
-                    extract_dir / real_filename / data["dirname"] / inner_file,
+                    extract_dir / real_filename / data["compress"] / inner_file,
                     extract_dir / real_filename / inner_file
                 )
         for inner_file in data["files"]:
             os.replace(
-                extract_dir / real_filename / data["dirname"] / inner_file,
+                extract_dir / real_filename / data["compress"] / inner_file,
                 extract_dir / real_filename / inner_file
             )
-        shutil.rmtree(extract_dir / real_filename / data["dirname"])
+        shutil.rmtree(extract_dir / real_filename / data["compress"])
 
-    # case [2]: no inner file to move, just delete configs or caches
+    # case (3): no inner file to move, just delete configs or caches
     else:
         for inner_file in data["dirs"]:
             if inner_file in not_used_files:
                 shutil.rmtree(extract_dir / real_filename / inner_file)
 
     # > re-check
-    _, dir_contents, file_contents = next(os.walk(extract_dir / real_filename))
-    dir_contents.sort()
-    file_contents.sort()
+    dir_contents, file_contents = list_sorted_daf(extract_dir / real_filename)
     if len(file_contents) <= 1 or len(dir_contents) >= 1:
         color.print(f"contents may error: {color.underline}{extract_dir / real_filename}", color.bold + color.red)
         error_list.append(f"[{num}] contents may error: {extract_dir / real_filename}")
 
-    # > haha, show slowly to bWe more beautiful :)
+    # > haha, show slowly to make it more beautiful :)
     time.sleep(0.01)
 
 

@@ -6,6 +6,7 @@ import difflib
 from pathlib import Path
 
 import lib.color as color
+from lib.path import very_stem, list_sorted_files, list_sorted_dirs
 from lib.excel import ExcelIO
 
 
@@ -29,8 +30,7 @@ if not os.path.exists(extract_dir) or not os.path.isdir(extract_dir):
 
 
 # all students
-_, all_students_name, _ = next(os.walk(extract_dir))
-all_students_name.sort()
+all_students_name = list_sorted_dirs(extract_dir)
 color.print(f"{len(all_students_name)} to diff", color.blue)
 all_students_path = [extract_dir / i for i in all_students_name]
 
@@ -39,11 +39,9 @@ all_students_path = [extract_dir / i for i in all_students_name]
 more_diff_name = []
 more_diff_path = []
 if os.path.exists(more_dir):
-    _, all_dirs, _ = next(os.walk(more_dir))
-    all_dirs.sort()
+    all_dirs = list_sorted_dirs(more_dir)
     for d in all_dirs:
-        _, homework_dirs, _ = next(os.walk(more_dir / d))
-        homework_dirs.sort()
+        homework_dirs = list_sorted_dirs(more_dir / d)
         if project_name in homework_dirs:
             more_diff_name.append(d)
             more_diff_path.append(more_dir / d / project_name)
@@ -80,16 +78,14 @@ for i in range(len(all_path_to_diff)):
         similarity_list = []
 
         # to lower
-        _, _, files_i = next(os.walk(all_path_to_diff[i]))
-        files_i.sort()
+        files_i = list_sorted_files(all_path_to_diff[i])
         files_i_lower = [s.lower() for s in files_i]
-        _, _, files_j = next(os.walk(all_path_to_diff[j]))
-        files_j.sort()
+        files_j = list_sorted_files(all_path_to_diff[j])
         files_j_lower = [s.lower() for s in files_j]
         for i_idx in range(len(files_i_lower)):
             if files_i_lower[i_idx] in files_j_lower:
                 j_idx = files_j_lower.index(files_i_lower[i_idx])
-                to_check.setdefault(Path(files_i_lower[i_idx]).stem, (files_i[i_idx], files_j[j_idx]))
+                to_check.setdefault(very_stem(files_i_lower[i_idx]), (files_i[i_idx], files_j[j_idx]))
 
         for stem_name, file_name_tuple in to_check.items():
             try:

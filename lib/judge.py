@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import TypedDict, Literal, Optional, Iterator
 
 import lib.color as color
+from lib.path import very_stem, list_sorted_dirs, list_sorted_files
 
 SingleTestcase = TypedDict(
     'SingleTestcase',
@@ -33,6 +34,8 @@ class JudgeProject:
             project_input_dir_path: directory structure is `dir -> name1.py, name2.py, abc.py, ...`
             temp_dir_path: temp directory, you can delete manually after running
             ignore_case: True or False
+        Attention:
+            You need to reload this object if the question files are changed.
         """
 
         self.project_testcase_dir_path = Path(project_testcase_dir_path)
@@ -44,16 +47,14 @@ class JudgeProject:
         self.project_testcase_dict: dict[str, dict[int, SingleTestcase]] = {}
         self.next_question_filename = ""
 
-        _, question_dirs, _ = next(os.walk(self.project_testcase_dir_path))
-        question_dirs.sort()
+        question_dirs = list_sorted_dirs(self.project_testcase_dir_path)
 
         for question_name in question_dirs:
             if self.ignore_case:
                 question_name = question_name.lower()
             self.project_testcase_dict[question_name] = {}
             r = self.project_testcase_dict[question_name]  # r is a short alias
-            _, _, subtestcase_int_files = next(os.walk(self.project_testcase_dir_path / question_name))
-            subtestcase_int_files.sort()
+            subtestcase_int_files = list_sorted_files(self.project_testcase_dir_path / question_name)
             for subtestcase_int_name in subtestcase_int_files:
                 num = Path(subtestcase_int_name).stem
                 r.setdefault(num, {})
@@ -96,17 +97,16 @@ class JudgeProject:
         if self.project_input_dir_path is None:
             raise ValueError(f"did not specify project_input_dir_path")
 
-        _, _, files_to_judge = next(os.walk(self.project_input_dir_path))
-        files_to_judge.sort()
+        files_to_judge = list_sorted_files(self.project_input_dir_path)
 
         for file_to_judge in files_to_judge:
             if self.ignore_case:
                 file_to_judge = file_to_judge.lower()
-            if self.project_testcase_dict.get(Path(file_to_judge).stem, None) is None:
+            if self.project_testcase_dict.get(very_stem(file_to_judge), None) is None:
                 color.print(f"skip {self.project_input_dir_path / file_to_judge} since its name does not match any testcase name", color.red)
                 continue
             self.next_question_filename = file_to_judge
-            yield Path(file_to_judge).stem
+            yield very_stem(file_to_judge)
 
         self.judge_usage = False
         return "yield_judge_list() StopIter"
@@ -129,13 +129,12 @@ class JudgeProject:
         if not self.judge_usage:
             raise SyntaxError("this function can only be used during yield_judge_list() iter time")
 
-        testcase_dict = self.project_testcase_dict[Path(self.next_question_filename).stem]
+        testcase_dict = self.project_testcase_dict[very_stem(self.next_question_filename)]
 
         shutil.rmtree(self.temp_dir_path, ignore_errors=True)
         self.temp_dir_path.mkdir(parents=True, exist_ok=True)
         if whole_files:
-            _, _, filenames = next(os.walk(self.project_input_dir_path))
-            filenames.sort()
+            filenames = list_sorted_files(self.project_input_dir_path)
             for i in filenames:
                 shutil.copyfile(self.project_input_dir_path / i, self.temp_dir_path / i)
         else:
@@ -184,7 +183,7 @@ class JudgeProject:
                 if self.__judge_text(num): right += 1
                 count += 1
             else:
-                raise ValueError(f"testcase type error: {testcase_data['type']} in {Path(self.next_question_filename).stem}")
+                raise ValueError(f"testcase type error: {testcase_data['type']} in {very_stem(self.next_question_filename)}")
 
         # get score
         return round(right / count * 50 + 50) if count > 0 else 100
@@ -196,7 +195,7 @@ class JudgeProject:
             raise SyntaxError("this function can only be used during yield_judge_list() iter time")
 
         file_to_judge = self.temp_dir_path / self.next_question_filename
-        testcase_data = self.project_testcase_dict[Path(self.next_question_filename).stem][num]
+        testcase_data = self.project_testcase_dict[very_stem(self.next_question_filename)][num]
 
         # run and get output; error will print on the screen
         # p = subprocess.Popen(['python', file_to_judge], stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
@@ -236,7 +235,7 @@ class JudgeProject:
             raise SyntaxError("this function can only be used during yield_judge_list() iter time")
 
         file_to_judge = self.temp_dir_path / self.next_question_filename
-        testcase_data = self.project_testcase_dict[Path(self.next_question_filename).stem][num]
+        testcase_data = self.project_testcase_dict[very_stem(self.next_question_filename)][num]
 
         # append testdata at the end
         with open(file_to_judge, 'a+') as f:

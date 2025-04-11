@@ -6,10 +6,13 @@ def very_stem(file_path) -> str:
     return the very stem of a file path
 
     e.g. `very_stem("a/b/c.txt.py.a")` -> `"c"`
+    e.g. `very_stem("a/b/.c.txt.py.a")` -> `".c"`
     """
     very_stem = Path(file_path).stem
-    while "." in very_stem:
-        very_stem = Path(very_stem).stem
+    new_stem = Path(very_stem).stem
+    while very_stem != new_stem:
+        very_stem = new_stem
+        new_stem = Path(very_stem).stem
     return very_stem
 
 def list_sorted_daf(path) -> tuple[list[str], list[str]]:

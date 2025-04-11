@@ -106,7 +106,9 @@ def display_menu(items, selected_index, cols: None | int = None):
         print(flush=False)
         new_line_time += 1
 
-    print(f"{color.gray}↑ ↓ ← → or number: select   Enter: confirm   q: quit{color.end}", end="", flush=True)
+    prompt_data = "↑ ↓ ← → or number: select   Enter: confirm   q: quit"
+    print(f"{color.white}{prompt_data}{color.end}", end="", flush=True)
+    new_line_time += len(prompt_data) // shutil.get_terminal_size().columns
 
 
 def select_from_list(items, cols: None | int = None):
@@ -124,10 +126,15 @@ def select_from_list(items, cols: None | int = None):
     row_stop_cols = total % cols
 
     selected_number = 0
-
+    need_update = True
     last_digit = ""
+
     while True:
-        display_menu(items, selected_number, cols)
+        if need_update:
+            display_menu(items, selected_number, cols)
+        else:
+            need_update = True
+
         key = get_key()
 
         if key == 'UP':
@@ -139,6 +146,9 @@ def select_from_list(items, cols: None | int = None):
                 selected_y = selected_y - 1
                 current_rows = rows - 1 if selected_y >= row_stop_cols else rows
                 selected_x = current_rows - 1
+            else:
+                need_update = False
+                continue
             selected_number = selected_x * cols + selected_y
         elif key == 'DOWN':
             selected_x = selected_number // cols
@@ -149,11 +159,22 @@ def select_from_list(items, cols: None | int = None):
             elif selected_y < cols - 1:
                 selected_y = selected_y + 1
                 selected_x = 0
+            else:
+                need_update = False
+                continue
             selected_number = selected_x * cols + selected_y
         elif key == 'RIGHT':
-            selected_number = min(total - 1, selected_number + 1)
+            if selected_number < total - 1:
+                selected_number = selected_number + 1
+            else:
+                need_update = False
+                continue
         elif key == 'LEFT':
-            selected_number = max(0, selected_number - 1)
+            if selected_number > 0:
+                selected_number = selected_number - 1
+            else:
+                need_update = False
+                continue
 
         elif key.isdigit():
             last_digit += key
@@ -166,15 +187,22 @@ def select_from_list(items, cols: None | int = None):
                 num = int(last_digit) - 1
                 if 0 <= num < len(items):
                     selected_number = num
+                else:
+                    need_update = False
+                    continue
 
         elif key == '\r' or key == '\n':
             return items[selected_number]
         elif key.lower() == 'q':
             return None
 
+        else:
+            need_update = False
+            continue
+
 
 if __name__ == "__main__":
-    sample_items = [str(i) for i in range(2145, 2145 + 97)]
+    sample_items = [str(i) for i in range(2145, 2145 + 103)]
     selected = select_from_list(sample_items)
     print()
     print(f"choosen: {selected}")

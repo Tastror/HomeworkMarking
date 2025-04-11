@@ -19,5 +19,5 @@ __pycache__
 # test example
 !/lab-example
 /lab-example/*
-!/lab-example/raw
+!/lab-example/submissions.zip
 !/lab-example/testcase

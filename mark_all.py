@@ -8,16 +8,17 @@ import lib.color as color
 from lib.judge import JudgeProject
 from lib.excel import ExcelIO
 from lib.path import list_sorted_dirs
+from lib.pattern import STUDENT_ID_NAME_PATTERN
+from lib.choose import select_from_list
 
 
 # input 1/3
-project_name = ""
-while project_name == "":
-    project_name = color.input(f"input the project name (lab1, homework1, lab2, etc.): ", color.blue)
-print(project_name)
-
-# preload the pattern
-student_id_name_pattern = re.compile(r"""([0-9]+)(.*)""")
+dirs = list_sorted_dirs("./")
+dirs = [i for i in dirs if i not in ["tmp", "lib", ".git", ".vscode", ".idea"]]
+dirs.sort()
+color.print(f"choose the project: ", color.blue)
+project_name = select_from_list(dirs)
+color.print(f"\nchoosen: {project_name}", color.green)
 
 
 # input files
@@ -138,7 +139,7 @@ for student in all_dirs:
             break
 
     # end of a student, save to excelio
-    res = student_id_name_pattern.match(student)
+    res = STUDENT_ID_NAME_PATTERN.match(student)
     excelio.score_write(res.group(2), res.group(1), 100, student_score)
 
     # end of a student, excelio save to file

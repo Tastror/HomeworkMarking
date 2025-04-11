@@ -7,17 +7,17 @@ A python code to judge and mark python homework automatically.
 - Python >= 3.10
 - VSCode
 
-install python requirements by yourself :]
+Please install the python requirements yourself :]
 
 (patool, pandas, openpyxl, etc.)
 
 ## Usage
 
-Create 2 directories, and put the students' codes and testcases in it, like
+Create 2 directories `submissions` and `testcase`, and put the zips of the students' codes and the testcases in them respectively, for example
 
 ```plaintext
 homework1/
-    raw/
+    submissions/  # or `submissions.zip`
         123zhangsan_useless_suffix.zip
             question1.py
             question2.py
@@ -38,7 +38,7 @@ homework1/
             2.py  # inner data: assert(Func(2) == 3)
 ```
 
-to prepare for the extraction and marking.
+The `submissions` directory can also be a zip named `submissions.zip`.
 
 ### Extract
 
@@ -48,11 +48,11 @@ Use
 python extract_all.py
 ```
 
-to extract `homework1/raw` to `homework1/extract/`.
+to extract the zips/rars in `homework1/submissions/` to `homework1/extract/`.
 
-As shown above, the name of the `.zip/.rar` file must be `<id><name>_<any other suffix>`, or you can modify the name split rule in `extract_all.py`.
+As shown above, the name of the `.zip/.rar` file must be `<id><name>_<any other suffix>`, or you can modify the name split rules in `lib/pattern.py`.
 
-Some students' zip files may contain invalid contents. To resolve the potential error, see `homework1/error.txt` for more information.
+Some students' zip files may contain invalid contents. To inspect and resolve the potential errors, see `homework1/error.txt` for more information.
 
 ### Mark
 
@@ -62,9 +62,9 @@ After resolving the errors, use
 python mark_all.py
 ```
 
-to mark scores. Just follow the prompt, and the result will be saved as an excel file `homework1/result.xlsx`.
+to mark scores. Just follow the prompt, and the result will be saved to an excel file named `homework1/result.xlsx`.
 
-Moreover, In `mark_all.py`, you can stop at any time you want (Ctrl + C), and start from any index you want. The result data of students will only be saved at the end of each index's process (prompt is `OK? or Retry? (just enter -> OK / input any string -> Retry):`).
+Moreover, In `mark_all.py`, you can stop at any time you want (Ctrl + C), and start from any index you want. The result data of students will only be saved at the end of each marking process (prompt is `OK / Retry (o -> OK / r -> Retry):`).
 
 ### Differentiate (Duplication Check)
 
@@ -74,7 +74,7 @@ Use
 python diff_all.py
 ```
 
-to check the codes' duplication rate. If you have some other codes as benchmark to check the student's codes, put them in `more_diff/` dir as below.
+to check the codes' duplication rate. If you have some other codes as benchmark to check the student's codes, also put them in the `more_diff/` directory as shown below.
 
 ```plaintext
 more_diff/

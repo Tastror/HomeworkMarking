@@ -8,12 +8,16 @@ from pathlib import Path
 import lib.color as color
 from lib.path import very_stem, list_sorted_files, list_sorted_dirs
 from lib.excel import ExcelIO
+from lib.choose import select_from_list
 
 
-# input
-project_name = ""
-while project_name == "":
-    project_name = color.input(f"input the project name (lab1, homework1, lab2, etc.): ", color.blue)
+# project
+dirs = list_sorted_dirs("./")
+dirs = [i for i in dirs if i not in ["tmp", "lib", ".git", ".vscode", ".idea"]]
+dirs.sort()
+color.print(f"choose the project: ", color.blue)
+project_name = select_from_list(dirs)
+color.print(f"\nchoosen: {project_name}", color.green)
 
 
 # input files

@@ -14,7 +14,7 @@ from lib.choose import select_from_list
 
 # input 1/3
 dirs = list_sorted_dirs("./")
-dirs = [i for i in dirs if i not in ["tmp", "lib", ".git", ".vscode", ".idea"]]
+dirs = [i for i in dirs if i not in ["tmp", "lib", "more_diff", ".git", ".vscode", ".idea"]]
 dirs.sort()
 color.print(f"choose the project: ", color.blue)
 project_name = select_from_list(dirs)

@@ -132,9 +132,8 @@ for student in all_dirs:
                     if len(result_list) == 0:
                         color.print("some is empty", color.red)
                     else:
-                        sq[1] = select_from_list(result_list, cols=1)
-                        if sq[1] is None: sq[1] = ""
-                        print()
+                        tmp_sq1 = select_from_list(result_list, cols=1); print()
+                        sq[1] = tmp_sq1 if tmp_sq1 is not None else sq[1]
                 elif i in [";", "；"]:
                     sq[0] = jp.judge(whole_files=whole_flag)
                 elif i in [".", ",", "。", "，"]:

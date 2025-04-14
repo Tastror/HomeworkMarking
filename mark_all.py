@@ -10,6 +10,7 @@ from lib.excel import ExcelIO
 from lib.path import list_sorted_dirs
 from lib.pattern import STUDENT_ID_NAME_PATTERN
 from lib.choose import select_from_list
+from lib.some import Some
 
 
 # input 1/3
@@ -23,6 +24,7 @@ color.print(f"\nchoosen: {project_name}", color.green)
 
 # input files
 testcase_path = Path(f"./{project_name}/testcase")
+some_path = testcase_path / "some"
 extract_dir = Path(f"./{project_name}/extract/")
 # files to generate / write
 result_xlsx = Path(f"./{project_name}/result.xlsx")
@@ -43,6 +45,9 @@ print(yes_100_flag)
 whole_flag = color.input("use whole files? (y/[n]): ", color.blue)
 whole_flag = True if whole_flag != "" and whole_flag.lower()[0] == "y" else False
 print(whole_flag)
+some_flag = color.input("use some automatically? ([y]/n): ", color.blue)
+some_flag = False if some_flag != "" and some_flag.lower()[0] == "n" else True
+print(some_flag)
 
 # get all files in <extract_dir> and <testcase_path>
 all_dirs = list_sorted_dirs(extract_dir)
@@ -51,6 +56,7 @@ testcase_dirs = list_sorted_dirs(testcase_path)
 
 # init JudgeProject
 jp = JudgeProject(testcase_path, temp_dir_path=temp_judge)
+some = Some(some_path)
 
 
 # init excel output object
@@ -98,19 +104,36 @@ for student in all_dirs:
                 continue
 
             # give true score and reason (if not 100)
+            this_time_some_flag = some_flag
             while True:
                 color.print(
                     f"give {identify_str} score: {sq[0]}\n"
                     f'give {identify_str} comment: {"(empty)" if sq[1] == "" else sq[1]}',
                     color.purple
                 )
-                color.print(
-                    "input: num -> give score / str -> give comment / . -> show python code / ; -> judge again / q -> quit",
-                    color.yellow
-                )
-                i = (color.input("num / str / . / ; / q : ", color.yellow))
+                if this_time_some_flag:
+                    color.print("use some automatically", color.yellow)
+                    this_time_some_flag = False
+                    i = "s"
+                else:
+                    color.print(
+                        "input: num -> give score / str -> give comment / s -> some / . -> show python code / ; -> judge again / q -> quit",
+                        color.yellow
+                    )
+                    i = (color.input("num / str / s / . / ; / q : ", color.yellow))
                 if i == "q":
                     break
+                elif i == "s":
+                    some.read()
+                    normal_list = some.result.get("normal", [])
+                    question_list = some.result.get(question_name, [])
+                    result_list = normal_list + question_list
+                    if len(result_list) == 0:
+                        color.print("some is empty", color.red)
+                    else:
+                        sq[1] = select_from_list(result_list, cols=1)
+                        if sq[1] is None: sq[1] = ""
+                        print()
                 elif i in [";", "；"]:
                     sq[0] = jp.judge(whole_files=whole_flag)
                 elif i in [".", ",", "。", "，"]:
@@ -121,6 +144,9 @@ for student in all_dirs:
                     pass
                 else:
                     sq[1] = i
+                    some.read()
+                    some.add(question_name, i)
+                    some.dump()
 
         # end of a student, check if need to retry
         color.print(f"[{num}] {student}:\n{student_score}", color.blue)

@@ -112,7 +112,10 @@ def display_menu(items, selected_index, cols: None | int = None):
 
 
 def select_from_list(items, cols: None | int = None):
-    global best_cols_data
+    global new_line_time, best_cols_data
+
+    new_line_time = 0
+    best_cols_data = None
 
     if not items: return None
 
@@ -124,6 +127,7 @@ def select_from_list(items, cols: None | int = None):
     total = len(items)
     rows = (total + cols - 1) // cols
     row_stop_cols = total % cols
+    if row_stop_cols == 0: row_stop_cols = cols
 
     selected_number = 0
     need_update = True

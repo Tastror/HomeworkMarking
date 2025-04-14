@@ -45,7 +45,7 @@ print(yes_100_flag)
 whole_flag = color.input("use whole files? (y/[n]): ", color.blue)
 whole_flag = True if whole_flag != "" and whole_flag.lower()[0] == "y" else False
 print(whole_flag)
-some_flag = color.input("use some automatically? ([y]/n): ", color.blue)
+some_flag = color.input("use some and vsc automatically? ([y]/n): ", color.blue)
 some_flag = False if some_flag != "" and some_flag.lower()[0] == "n" else True
 print(some_flag)
 
@@ -112,8 +112,9 @@ for student in all_dirs:
                     color.purple
                 )
                 if this_time_some_flag:
-                    color.print("use some automatically", color.yellow)
+                    color.print("use some and vsc automatically", color.yellow)
                     this_time_some_flag = False
+                    jp.show_in_vscode()
                     i = "s"
                 else:
                     color.print(

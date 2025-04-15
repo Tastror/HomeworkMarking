@@ -27,7 +27,7 @@ def get_key():
         try:
             tty.setraw(sys.stdin.fileno())
             ch = sys.stdin.read(1)
-            if key == b'\x03' or key == b'\x1a':
+            if ch == '\x03' or ch == '\x1a':
                 exit(0)
             if ch == '\x1b':
                 ch = sys.stdin.read(1)

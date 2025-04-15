@@ -11,14 +11,20 @@ def get_key():
         key = msvcrt.getch()
         if key == b'\x03' or key == b'\x1a':
             exit(0)
-        if key == b'\xe0':
+        elif key == b'\xe0':
             key = msvcrt.getch()
             if key == b'H': return 'UP'
             if key == b'P': return 'DOWN'
             if key == b'M': return 'RIGHT'
             if key == b'K': return 'LEFT'
-        if key == b'\r' or key == b'\n':
-            return '\r'
+        elif key == b'\r' or key == b'\n':
+            return '\n'
+        # use wasd to control
+        else:
+            if key == b"w": return 'UP'
+            if key == b"s": return 'DOWN'
+            if key == b"d": return 'RIGHT'
+            if key == b"a": return 'LEFT'
         return key.decode('utf-8')
     else:
         import termios, tty
@@ -29,7 +35,7 @@ def get_key():
             ch = sys.stdin.read(1)
             if ch == '\x03' or ch == '\x1a':
                 exit(0)
-            if ch == '\x1b':
+            elif ch == '\x1b':
                 ch = sys.stdin.read(1)
                 if ch == '[':
                     ch = sys.stdin.read(1)
@@ -37,6 +43,12 @@ def get_key():
                     if ch == 'B': return 'DOWN'
                     if ch == 'C': return 'RIGHT'
                     if ch == 'D': return 'LEFT'
+            # use wasd to control
+            else:
+                if ch == 'w': return 'UP'
+                if ch == 's': return 'DOWN'
+                if ch == 'd': return 'RIGHT'
+                if ch == 'a': return 'LEFT'
             return ch
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)

@@ -21,10 +21,10 @@ def get_key():
             return '\n'
         # use wasd to control
         else:
-            if key == b"w": return 'UP'
-            if key == b"s": return 'DOWN'
-            if key == b"d": return 'RIGHT'
-            if key == b"a": return 'LEFT'
+            if key == b"w" or key == b"W": return 'UP'
+            if key == b"s" or key == b"S": return 'DOWN'
+            if key == b"d" or key == b"D": return 'RIGHT'
+            if key == b"a" or key == b"A": return 'LEFT'
         return key.decode('utf-8')
     else:
         import termios, tty
@@ -45,10 +45,10 @@ def get_key():
                     if ch == 'D': return 'LEFT'
             # use wasd to control
             else:
-                if ch == 'w': return 'UP'
-                if ch == 's': return 'DOWN'
-                if ch == 'd': return 'RIGHT'
-                if ch == 'a': return 'LEFT'
+                if ch == 'w' or ch == 'W': return 'UP'
+                if ch == 's' or ch == 'S': return 'DOWN'
+                if ch == 'd' or ch == 'D': return 'RIGHT'
+                if ch == 'a' or ch == 'A': return 'LEFT'
             return ch
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)

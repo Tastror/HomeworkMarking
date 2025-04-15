@@ -42,9 +42,6 @@ def get_key():
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 
-new_line_time = 0
-best_cols_data = None
-
 def best_cols(items):
     tty_column = shutil.get_terminal_size().columns
 
@@ -67,18 +64,13 @@ def best_cols(items):
 
     return left
 
-def display_menu(items, selected_index, cols: None | int = None):
 
-    global new_line_time, best_cols_data
+def display_menu(items, selected_index, cols, last_new_line_time):
 
-    if cols is None:
-        if best_cols_data is None:
-            best_cols_data = best_cols(items)
-        cols = best_cols_data
-
-    if new_line_time > 0:
-        color.cursor_up(new_line_time, flush=False)
+    if last_new_line_time > 0:
+        color.cursor_up(last_new_line_time, flush=False)
         color.cursor_row_home(flush=False)
+
     new_line_time = 0
 
     col_widths = [0] * cols
@@ -110,32 +102,31 @@ def display_menu(items, selected_index, cols: None | int = None):
     print(f"{color.white}{prompt_data}{color.end}", end="", flush=True)
     new_line_time += len(prompt_data) // shutil.get_terminal_size().columns
 
+    return new_line_time
+
 
 def select_from_list(items, cols: None | int = None):
-    global new_line_time, best_cols_data
-
-    new_line_time = 0
-    best_cols_data = None
 
     if not items: return None
 
     if cols is None:
-        if best_cols_data is None:
-            best_cols_data = best_cols(items)
-        cols = best_cols_data
+        cols = best_cols(items)
 
     total = len(items)
     rows = (total + cols - 1) // cols
     row_stop_cols = total % cols
     if row_stop_cols == 0: row_stop_cols = cols
 
+    new_line_time = 0
     selected_number = 0
     need_update = True
     last_digit = ""
 
     while True:
         if need_update:
-            display_menu(items, selected_number, cols)
+            new_line_time = display_menu(
+                items, selected_number, cols, new_line_time
+            )
         else:
             need_update = True
 

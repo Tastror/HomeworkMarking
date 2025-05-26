@@ -115,6 +115,7 @@ for student in all_dirs:
                     f'give {identify_str} comment: {"(empty)" if sq[1] == "" else sq[1]}',
                     color.purple
                 )
+                i = ""
                 if this_time_some_flag or this_time_vsc_flag:
                     if this_time_some_flag:
                         color.print("use some automatically", color.yellow)
@@ -129,7 +130,7 @@ for student in all_dirs:
                         "input: num -> give score / str -> give comment / s -> some / . -> show python code / ; -> judge again / q -> quit",
                         color.yellow
                     )
-                    i = (color.input("num / str / s / . / ; / q : ", color.yellow))
+                    i = color.input("num / str / s / . / ; / q : ", color.yellow)
                 if i == "q":
                     break
                 elif i == "s":

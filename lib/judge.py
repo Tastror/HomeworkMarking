@@ -44,7 +44,7 @@ class JudgeProject:
         self.ignore_case = ignore_case
         self.judge_usage = False
 
-        self.project_testcase_dict: dict[str, dict[int, SingleTestcase]] = {}
+        self.project_testcase_dict: dict[str, dict[str, SingleTestcase]] = {}
         self.next_question_filename = ""
 
         question_dirs = list_sorted_dirs(self.project_testcase_dir_path)
@@ -54,25 +54,25 @@ class JudgeProject:
                 question_name = question_name.lower()
             self.project_testcase_dict[question_name] = {}
             r = self.project_testcase_dict[question_name]  # r is a short alias
-            subtestcase_int_files = list_sorted_files(self.project_testcase_dir_path / question_name)
-            for subtestcase_int_name in subtestcase_int_files:
-                num = Path(subtestcase_int_name).stem
-                r.setdefault(num, {})
-                suffix = Path(subtestcase_int_name).suffix
+            subtestcase_files = list_sorted_files(self.project_testcase_dir_path / question_name)
+            for subtestcase_name in subtestcase_files:
+                name = Path(subtestcase_name).stem
+                r.setdefault(name, { "type": 'text', "py": None, "in": None, "out": None, })
+                suffix = Path(subtestcase_name).suffix
                 if suffix == ".in":
-                    r[num]["type"] = "text"
-                    with open(self.project_testcase_dir_path / question_name / subtestcase_int_name) as f:
-                        r[num]["in"] = f.read() + '\n'
+                    r[name]["type"] = "text"
+                    with open(self.project_testcase_dir_path / question_name / subtestcase_name) as f:
+                        r[name]["in"] = f.read() + '\n'
                 elif suffix == ".out":
-                    r[num]["type"] = "text"
-                    with open(self.project_testcase_dir_path / question_name / subtestcase_int_name) as f:
-                        r[num]["out"] = f.read()
+                    r[name]["type"] = "text"
+                    with open(self.project_testcase_dir_path / question_name / subtestcase_name) as f:
+                        r[name]["out"] = f.read()
                 elif suffix == ".py":
-                    r[num]["type"] = "py"
-                    with open(self.project_testcase_dir_path / question_name / subtestcase_int_name) as f:
-                        r[num]["py"] = f.read()
+                    r[name]["type"] = "py"
+                    with open(self.project_testcase_dir_path / question_name / subtestcase_name) as f:
+                        r[name]["py"] = f.read()
                 else:
-                    raise ValueError(f"cannot recognize suffix {self.project_testcase_dir_path / question_name / subtestcase_int_name}")
+                    raise ValueError(f"cannot recognize suffix {self.project_testcase_dir_path / question_name / subtestcase_name}")
 
 
     def yield_judge_list(self, project_input_dir_path: Optional[Path] = None) -> Iterator[str]:
@@ -170,17 +170,17 @@ class JudgeProject:
 
         count, right = 0, 0
 
-        for num, testcase_data in testcase_dict.items():
-            color.print(f"testing testcase {num}", color.cyan)
+        for name, testcase_data in testcase_dict.items():
+            color.print(f"testing testcase {name}", color.cyan)
             # use for judge function assertion (append .py data to file)
             if testcase_data["type"] == "py":
-                if self.__judge_py(num): right += 1
+                if self.__judge_py(name): right += 1
                 # refresh file
                 shutil.copyfile(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
                 count += 1
             # use for normal input & output
             elif testcase_data["type"] == "text":
-                if self.__judge_text(num): right += 1
+                if self.__judge_text(name): right += 1
                 count += 1
             else:
                 raise ValueError(f"testcase type error: {testcase_data['type']} in {very_stem(self.next_question_filename)}")
@@ -189,13 +189,13 @@ class JudgeProject:
         return round(right / count * 50 + 50) if count > 0 else 100
 
 
-    def __judge_text(self, num: int) -> bool:
+    def __judge_text(self, name: str) -> bool:
 
         if not self.judge_usage:
             raise SyntaxError("this function can only be used during yield_judge_list() iter time")
 
         file_to_judge = self.temp_dir_path / self.next_question_filename
-        testcase_data = self.project_testcase_dict[very_stem(self.next_question_filename)][num]
+        testcase_data = self.project_testcase_dict[very_stem(self.next_question_filename)][name]
 
         # run and get output; error will print on the screen
         # p = subprocess.Popen(['python', file_to_judge], stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
@@ -229,13 +229,13 @@ class JudgeProject:
             return False
 
 
-    def __judge_py(self, num: int) -> bool:
+    def __judge_py(self, name: str) -> bool:
 
         if not self.judge_usage:
             raise SyntaxError("this function can only be used during yield_judge_list() iter time")
 
         file_to_judge = self.temp_dir_path / self.next_question_filename
-        testcase_data = self.project_testcase_dict[very_stem(self.next_question_filename)][num]
+        testcase_data = self.project_testcase_dict[very_stem(self.next_question_filename)][name]
 
         # append testdata at the end
         with open(file_to_judge, 'a+') as f:

@@ -74,8 +74,10 @@ for filename in all_files:
     filename_stem = Path(filename).stem
     try:
         res = NAME_SPLIT_PATTERN.match(filename_stem)
+        assert(res is not None)
         real_filename = res.group(1)
         res2 = STUDENT_ID_NAME_PATTERN.match(real_filename)
+        assert(res2 is not None)
         error_test = res2.group(0)
     except:
         color.print(f"not a valid filename: {color.underline}{project_file / filename}", color.bold + color.red)

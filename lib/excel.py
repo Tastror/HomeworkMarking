@@ -2,13 +2,14 @@ import os
 import pandas
 from copy import deepcopy
 from pathlib import Path
+from typing import Any
 
 class ExcelIO:
     def __init__(self, file: str | Path):
         self._file = file
         self._init = False
-        self._single_df = None
-        self._df_sheets = None
+        self._single_df: Any = None
+        self._df_sheets: Any = None
 
     def excel_init(self, row_list: list[str], col_list: list[str]) -> None:
 
@@ -61,7 +62,7 @@ class ExcelIO:
             writer = pandas.ExcelWriter(self._file)
             for k, v in self._df_sheets.items():
                 v.to_excel(excel_writer=writer, sheet_name=k)
-            writer._save()
+            writer.close()
         elif self._df_sheets is None:
             self._single_df.to_excel(self._file)
         else:

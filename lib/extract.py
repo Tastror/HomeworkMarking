@@ -1,5 +1,6 @@
 import zipfile
 import patoolib
+from pathlib import Path
 
 # download unrar first! such as
 # (Arch) sudo pacman -S unrar
@@ -7,19 +8,19 @@ import patoolib
 # (Windows) winget install unrar
 # Windows 7z: https://www.7-zip.org/
 def extract_single_file(
-    path: str, zipname: str, target_path: str, target_dir: str
+    path: str | Path, zipname: str | Path, target_path: str | Path, target_dir: str | Path
 ):
     if str(zipname).endswith(".zip"):
-        (target_path / target_dir).mkdir(parents=True, exist_ok=True)
-        with zipfile.ZipFile(path / zipname, 'r') as f:
+        (Path(target_path) / target_dir).mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(Path(path) / zipname, 'r') as f:
             for file in f.namelist():
-                f.extract(file, target_path / target_dir)
+                f.extract(file, Path(target_path) / target_dir)
         return True
     elif str(zipname).endswith((".rar", ".7z")):
-        (target_path / target_dir).mkdir(parents=True, exist_ok=True)
+        (Path(target_path) / target_dir).mkdir(parents=True, exist_ok=True)
         patoolib.extract_archive(
-            path / zipname, verbosity=-1,
-            outdir=target_path / target_dir, interactive=False
+            str(Path(path) / zipname), verbosity=-1,
+            outdir=str(Path(target_path) / target_dir), interactive=False
         )
         return True
     return False

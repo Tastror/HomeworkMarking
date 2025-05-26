@@ -1,4 +1,5 @@
 import sys
+from typing import Any
 
 usual_print = print
 usual_input = input
@@ -12,15 +13,15 @@ gray = dark_black
 end = reset
 
 
-def format(text: any, color: str) -> str:
+def format(text: Any, color: str) -> str:
     return f"{color}{text}{reset}"
 
 
-def input(text: any, color: str = reset, *args, **kargs) -> str:
+def input(text: Any, color: str = reset, *args, **kargs) -> str:
     return usual_input(f"{color}{text}{reset}", *args, **kargs)
 
 
-def print(text: any, color: str = reset, *args, **kargs):
+def print(text: Any, color: str = reset, *args, **kargs):
     usual_print(f"{color}{text}{reset}", *args, **kargs)
 
 
@@ -50,7 +51,7 @@ def cursor_down(n: int, flush: bool = True):
     if flush: sys.stdout.flush()
 
 
-def print_there(x: int, y: int, text: any, color: str = reset, flush: bool = True):
+def print_there(x: int, y: int, text: Any, color: str = reset, flush: bool = True):
     # \033[x;yf or \033[x;yH: move to x, y
     # \0337 or \033[s: save cursor position
     # \0338 or \033[u: restore cursor position
@@ -60,7 +61,7 @@ def print_there(x: int, y: int, text: any, color: str = reset, flush: bool = Tru
     if flush: sys.stdout.flush()
 
 
-def print_still(text: any, color: str = reset, flush: bool = True):
+def print_still(text: Any, color: str = reset, flush: bool = True):
     # \033[xA: move up x chars
     # \033[xB: move down x chars
     # \033[xC: move right x chars
@@ -68,7 +69,7 @@ def print_still(text: any, color: str = reset, flush: bool = True):
     sys.stdout.write(f"\033[{len(text)}D{color}{text}{reset}")
     if flush: sys.stdout.flush()
 
-def print_must_still(text: any, color: str, flush: bool = True):
+def print_must_still(text: Any, color: str, flush: bool = True):
     # \033[xA: move up x chars
     # \033[xB: move down x chars
     # \033[xC: move right x chars

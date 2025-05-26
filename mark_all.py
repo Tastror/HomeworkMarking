@@ -42,12 +42,15 @@ if not os.path.exists(extract_dir) or not os.path.isdir(extract_dir):
 yes_100_flag = color.input("skip 100 score automatically? ([y]/n): ", color.blue)
 yes_100_flag = False if yes_100_flag != "" and yes_100_flag.lower()[0] == "n" else True
 print(yes_100_flag)
-whole_flag = color.input("use whole files? (y/[n]): ", color.blue)
-whole_flag = True if whole_flag != "" and whole_flag.lower()[0] == "y" else False
+whole_flag = color.input("use whole files? ([y]/n): ", color.blue)
+whole_flag = False if whole_flag != "" and whole_flag.lower()[0] == "n" else True
 print(whole_flag)
-some_flag = color.input("use some and vsc automatically? ([y]/n): ", color.blue)
+some_flag = color.input("use some automatically? ([y]/n): ", color.blue)
 some_flag = False if some_flag != "" and some_flag.lower()[0] == "n" else True
 print(some_flag)
+vsc_flag = color.input("use vsc automatically? (y/[n]): ", color.blue)
+vsc_flag = True if vsc_flag != "" and vsc_flag.lower()[0] == "y" else False
+print(vsc_flag)
 
 # get all files in <extract_dir> and <testcase_path>
 all_dirs = list_sorted_dirs(extract_dir)
@@ -105,17 +108,22 @@ for student in all_dirs:
 
             # give true score and reason (if not 100)
             this_time_some_flag = some_flag
+            this_time_vsc_flag = vsc_flag
             while True:
                 color.print(
                     f"give {identify_str} score: {sq[0]}\n"
                     f'give {identify_str} comment: {"(empty)" if sq[1] == "" else sq[1]}',
                     color.purple
                 )
-                if this_time_some_flag:
-                    color.print("use some and vsc automatically", color.yellow)
-                    this_time_some_flag = False
-                    jp.show_in_vscode()
-                    i = "s"
+                if this_time_some_flag or this_time_vsc_flag:
+                    if this_time_some_flag:
+                        color.print("use some automatically", color.yellow)
+                        this_time_some_flag = False
+                        i = "s"
+                    if this_time_vsc_flag:
+                        color.print("use vsc automatically", color.yellow)
+                        this_time_vsc_flag = False
+                        jp.show_in_vscode()
                 else:
                     color.print(
                         "input: num -> give score / str -> give comment / s -> some / . -> show python code / ; -> judge again / q -> quit",

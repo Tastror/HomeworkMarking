@@ -8,11 +8,11 @@ import lib.color as color
 def get_key():
     if platform.system() == 'Windows':
         import msvcrt
-        key = msvcrt.getch()
+        key = msvcrt.getch()  # type: ignore
         if key == b'\x03' or key == b'\x1a':
             exit(0)
         elif key == b'\xe0':
-            key = msvcrt.getch()
+            key = msvcrt.getch()  # type: ignore
             if key == b'H': return 'UP'
             if key == b'P': return 'DOWN'
             if key == b'M': return 'RIGHT'

@@ -115,6 +115,7 @@ class JudgeProject:
     def show_in_vscode(self):
         if not self.judge_usage:
             raise SyntaxError("this function can only be used during yield_judge_list() iter time")
+        assert(self.project_input_dir_path is not None)
         try:
             # this won't work well if you don't have code (vscode) command in your PATH
             # while unix is more common to have code (vscode) command
@@ -128,19 +129,12 @@ class JudgeProject:
 
         if not self.judge_usage:
             raise SyntaxError("this function can only be used during yield_judge_list() iter time")
+        assert(self.project_input_dir_path is not None)
 
         testcase_dict = self.project_testcase_dict[very_stem(self.next_question_filename)]
 
-        shutil.rmtree(self.temp_dir_path, ignore_errors=True)
-        self.temp_dir_path.mkdir(parents=True, exist_ok=True)
-        if whole_files:
-            filenames = list_sorted_files(self.project_input_dir_path)
-            for i in filenames:
-                shutil.copyfile(self.project_input_dir_path / i, self.temp_dir_path / i)
-        else:
-            shutil.copyfile(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
-
         def get_rid_of_dangerous_code(file_path):
+            assert(self.project_input_dir_path is not None)
             with open(file_path, errors='ignore') as f:
                 s = f.read()
                 dangerous = [" os", " sys", " shutil", " pathlib", " subprocess"]
@@ -162,10 +156,16 @@ class JudgeProject:
                             shutil.copyfile(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
                             break
 
+        shutil.rmtree(self.temp_dir_path, ignore_errors=True)
+        self.temp_dir_path.mkdir(parents=True, exist_ok=True)
+
         if whole_files:
+            filenames = list_sorted_files(self.project_input_dir_path)
             for i in filenames:
+                shutil.copyfile(self.project_input_dir_path / i, self.temp_dir_path / i)
                 get_rid_of_dangerous_code(self.temp_dir_path / i)
         else:
+            shutil.copyfile(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
             get_rid_of_dangerous_code(self.temp_dir_path / self.next_question_filename)
 
         count, right = 0, 0
@@ -196,6 +196,8 @@ class JudgeProject:
 
         file_to_judge = self.temp_dir_path / self.next_question_filename
         testcase_data = self.project_testcase_dict[very_stem(self.next_question_filename)][name]
+        assert(testcase_data["in"] is not None)
+        assert(testcase_data["out"] is not None)
 
         # run and get output; error will print on the screen
         # p = subprocess.Popen(['python', file_to_judge], stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
@@ -236,6 +238,7 @@ class JudgeProject:
 
         file_to_judge = self.temp_dir_path / self.next_question_filename
         testcase_data = self.project_testcase_dict[very_stem(self.next_question_filename)][name]
+        assert(testcase_data["py"] is not None)
 
         # append testdata at the end
         with open(file_to_judge, 'a+') as f:

@@ -10,17 +10,22 @@ from pathlib import Path
 def extract_single_file(
     path: str | Path, zipname: str | Path, target_path: str | Path, target_dir: str | Path
 ):
+    target_path = Path(target_path)
+    zipname = Path(zipname)
+    path = Path(path)
+    target_dir = Path(target_dir)
+
     if str(zipname).endswith(".zip"):
-        (Path(target_path) / target_dir).mkdir(parents=True, exist_ok=True)
-        with zipfile.ZipFile(Path(path) / zipname, 'r') as f:
+        (target_path / target_dir).mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(path / zipname, 'r') as f:
             for file in f.namelist():
-                f.extract(file, Path(target_path) / target_dir)
+                f.extract(file, target_path / target_dir)
         return True
     elif str(zipname).endswith((".rar", ".7z")):
-        (Path(target_path) / target_dir).mkdir(parents=True, exist_ok=True)
+        (target_path / target_dir).mkdir(parents=True, exist_ok=True)
         patoolib.extract_archive(
-            str(Path(path) / zipname), verbosity=-1,
-            outdir=str(Path(target_path) / target_dir), interactive=False
+            str(path / zipname), verbosity=-1,
+            outdir=str(target_path / target_dir), interactive=False
         )
         return True
     return False

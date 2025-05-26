@@ -1,7 +1,8 @@
 import os
+from pathlib import Path
 
 class Some:
-    def __init__(self, path: str):
+    def __init__(self, path: str | Path):
         self.path = path
         self.result = dict()
 

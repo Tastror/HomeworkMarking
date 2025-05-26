@@ -166,7 +166,8 @@ for student in all_dirs:
 
     # end of a student, save to excelio
     res = STUDENT_ID_NAME_PATTERN.match(student)
-    excelio.score_write(res.group(2), res.group(1), 100, student_score)
+    assert(res is not None)
+    excelio.score_write(res.group(2), int(res.group(1)), 100, student_score)
 
     # end of a student, excelio save to file
     while True:

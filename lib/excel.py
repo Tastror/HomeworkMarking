@@ -1,9 +1,10 @@
 import os
 import pandas
 from copy import deepcopy
+from pathlib import Path
 
 class ExcelIO:
-    def __init__(self, file: str):
+    def __init__(self, file: str | Path):
         self._file = file
         self._init = False
         self._single_df = None
@@ -48,7 +49,7 @@ class ExcelIO:
         self._df_sheets.setdefault(sheet, deepcopy(self._template_df))
         self._df_sheets[sheet].at[row_name, col_name] = data
 
-    def score_write(self, name: str, id: int, all_score: str, score_comment_dict: dict[str, list[int, str]]) -> None:
+    def score_write(self, name: str, id: int, all_score: int, score_comment_dict: dict[str, list]) -> None:
         now_row = self.row_num
         self._single_df.loc[now_row, ['name', 'id', 'all_score']] = [name, id, all_score]
         for k, v in score_comment_dict.items():

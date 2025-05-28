@@ -1,12 +1,11 @@
 import sys
 import shutil
-import platform
 
 import lib.color as color
 
 
 def get_key():
-    if platform.system() == 'Windows':
+    if sys.platform == 'win32':
         import msvcrt
         key = msvcrt.getch()  # type: ignore
         if key == b'\x03' or key == b'\x1a':
@@ -25,7 +24,10 @@ def get_key():
             if key == b"s" or key == b"S": return 'DOWN'
             if key == b"d" or key == b"D": return 'RIGHT'
             if key == b"a" or key == b"A": return 'LEFT'
-        return key.decode('utf-8')
+        try:
+            return key.decode('utf-8')
+        except UnicodeDecodeError:
+            return ""
     else:
         import termios, tty
         fd = sys.stdin.fileno()

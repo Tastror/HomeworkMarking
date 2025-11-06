@@ -7,9 +7,7 @@ A python code to judge and mark python homework automatically.
 - Python >= 3.10
 - VSCode
 
-Please install the python requirements yourself :]
-
-(patool, pandas, openpyxl, etc.)
+Please use `uv sync` or install the python requirements (in `pyproject.toml`) yourself :]
 
 ## Usage
 
@@ -17,7 +15,7 @@ Create 2 directories `submissions` and `testcase`, and put the zips of the stude
 
 ```plaintext
 homework1/
-    submissions/  # or `submissions.zip`
+    submissions.zip/  # or `submissions` dir
         123zhangsan_useless_suffix.zip
             question1.py
             question2.py
@@ -45,7 +43,8 @@ The `submissions` directory can also be a zip named `submissions.zip`.
 Use
 
 ```shell
-python extract_all.py
+uv run extract_all.py
+# python extract_all.py
 ```
 
 to extract the zips/rars in `homework1/submissions/` to `homework1/extract/`.
@@ -59,7 +58,8 @@ Some students' zip files may contain invalid contents. To inspect and resolve th
 After resolving the errors, use
 
 ```shell
-python mark_all.py
+uv run mark_all.py
+# python mark_all.py
 ```
 
 to mark scores. Just follow the prompt, and the result will be saved to an excel file named `homework1/result.xlsx`.
@@ -71,7 +71,8 @@ Moreover, In `mark_all.py`, you can stop at any time you want (Ctrl + C), and st
 Use
 
 ```shell
-python diff_all.py
+uv run diff_all.py
+# python diff_all.py
 ```
 
 to check the codes' duplication rate. If you have some other codes as benchmark to check the student's codes, also put them in the `more_diff/` directory as shown below.

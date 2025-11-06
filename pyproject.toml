@@ -1,0 +1,12 @@
+[project]
+name = "homeworkmarking"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "patool",
+    "pandas",
+    "openpyxl",
+]
+
+[tool.uv]
+index-url = "https://pypi.tuna.tsinghua.edu.cn/simple/"

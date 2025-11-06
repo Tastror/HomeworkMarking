@@ -36,8 +36,6 @@ homework1/
             2.py  # inner data: assert(Func(2) == 3)
 ```
 
-The `submissions` directory can also be a zip named `submissions.zip`.
-
 ### Extract
 
 Use
@@ -47,7 +45,7 @@ uv run extract_all.py
 # python extract_all.py
 ```
 
-to extract the zips/rars in `homework1/submissions/` to `homework1/extract/`.
+to extract the zips/rars in `homework1/submissions.zip` (or `submissions/`) to `homework1/extract/`.
 
 As shown above, the name of the `.zip/.rar` file must be `<id><name>_<any other suffix>`, or you can modify the name split rules in `lib/pattern.py`.
 

@@ -6,6 +6,7 @@ dependencies = [
     "patool",
     "pandas",
     "openpyxl",
+    "prompt_toolkit",
 ]
 
 [tool.uv]

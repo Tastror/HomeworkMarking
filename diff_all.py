@@ -10,6 +10,9 @@ import lib.constant as constant
 from lib.path import very_stem, list_sorted_files, list_sorted_dirs
 from lib.excel import ExcelIO
 from lib.choose import select_from_list
+from lib.signal import register_sigint
+
+register_sigint()
 
 
 # project

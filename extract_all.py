@@ -12,7 +12,9 @@ from lib.path import list_sorted_dirs, list_sorted_files, list_sorted_daf
 from lib.extract import extract_single_file
 from lib.pattern import NAME_SPLIT_PATTERN, STUDENT_ID_NAME_PATTERN
 from lib.choose import select_from_list
+from lib.signal import register_sigint
 
+register_sigint()
 
 
 # project

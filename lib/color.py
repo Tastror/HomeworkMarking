@@ -1,8 +1,23 @@
 import sys
 from typing import Any
 
-usual_print = print
-usual_input = input
+from prompt_toolkit import print_formatted_text, prompt, ANSI
+
+# 注册 Ctrl+C，否则会输出一长串很烦人
+from prompt_toolkit import PromptSession
+from prompt_toolkit.key_binding import KeyBindings
+kb = KeyBindings()
+@kb.add('c-c')
+def _(event):
+    print('\n(SIGINT) quit')
+    sys.exit(0)
+session = PromptSession(key_bindings=kb)
+
+
+# TODO: fundamentally use prompt_toolkit
+
+usual_print = print_formatted_text
+usual_input = session.prompt
 
 reset, bold, _, _, underline = tuple(f"\033[{i}m" for i in range(0, 4 + 1))
 dark_black, dark_red, dark_green, dark_yellow, dark_blue, dark_purple, dark_cyan, dark_white = tuple(f"\033[{i}m" for i in range(30, 37 + 1))
@@ -18,11 +33,11 @@ def format(text: Any, color: str) -> str:
 
 
 def input(text: Any, color: str = reset, *args, **kargs) -> str:
-    return usual_input(f"{color}{text}{reset}", *args, **kargs)
+    return usual_input(ANSI(f"{color}{text}{reset}"), *args, **kargs)
 
 
 def print(text: Any, color: str = reset, *args, **kargs):
-    usual_print(f"{color}{text}{reset}", *args, **kargs)
+    usual_print(ANSI(f"{color}{text}{reset}"), *args, **kargs)
 
 
 def cursor_left(n: int, flush: bool = True):

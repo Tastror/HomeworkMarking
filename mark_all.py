@@ -12,6 +12,9 @@ from lib.path import list_sorted_dirs
 from lib.pattern import STUDENT_ID_NAME_PATTERN
 from lib.choose import select_from_list
 from lib.message import Message
+from lib.signal import register_sigint
+
+register_sigint()
 
 
 # input 1/3

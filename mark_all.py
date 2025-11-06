@@ -42,18 +42,24 @@ if not os.path.exists(extract_dir) or not os.path.isdir(extract_dir):
     raise ValueError(f"no directory called {extract_dir}")
 
 
+def default_yes(s: str) -> bool:
+    return False if s != "" and s.lower()[0] == "n" else True
+
+def default_no(s: str) -> bool:
+    return True if s != "" and s.lower()[0] == "y" else False
+
 # input 2/3
 yes_100_flag = color.input("skip 100 score automatically? ([y]/n): ", color.blue)
-yes_100_flag = False if yes_100_flag != "" and yes_100_flag.lower()[0] == "n" else True
+yes_100_flag = default_yes(yes_100_flag)
 print(yes_100_flag)
 whole_flag = color.input("copy all files together (if one file depend another)? ([y]/n): ", color.blue)
-whole_flag = False if whole_flag != "" and whole_flag.lower()[0] == "n" else True
+whole_flag = default_yes(whole_flag)
 print(whole_flag)
-message_flag = color.input("use old error message automatically? ([y]/n): ", color.blue)
-message_flag = False if message_flag != "" and message_flag.lower()[0] == "n" else True
+message_flag = color.input("use old error message automatically? (y/[n]): ", color.blue)
+message_flag = default_no(message_flag)
 print(message_flag)
 vsc_flag = color.input("open vscode when error automatically? (y/[n]): ", color.blue)
-vsc_flag = True if vsc_flag != "" and vsc_flag.lower()[0] == "y" else False
+vsc_flag = default_no(vsc_flag)
 print(vsc_flag)
 
 # get all files in <extract_dir> and <testcase_path>
@@ -131,7 +137,7 @@ for student in all_dirs:
                     if this_time_message_flag:
                         color.print("use error message automatically", color.yellow)
                         this_time_message_flag = False
-                        i = "s"
+                        i = "m"
                     if this_time_vsc_flag:
                         color.print("open vscode automatically", color.yellow)
                         this_time_vsc_flag = False

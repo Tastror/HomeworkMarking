@@ -11,7 +11,7 @@ from lib.excel import ExcelIO
 from lib.path import list_sorted_dirs
 from lib.pattern import STUDENT_ID_NAME_PATTERN
 from lib.choose import select_from_list
-from lib.some import Some
+from lib.message import Message
 
 
 # input 1/3
@@ -25,7 +25,7 @@ color.print(f"\nchosen: {project_name}", color.green)
 
 # input files
 testcase_path = Path(f"./{project_name}/{constant.TESTCASE_DIR}/")
-some_path = testcase_path / "some"
+message_path = testcase_path / constant.MESSAGE_FILE
 extract_dir = Path(f"./{project_name}/{constant.EXTRACT_DIR}/")
 # files to generate / write
 result_xlsx = Path(f"./{project_name}/{constant.RESULT_EXCEL}")
@@ -43,13 +43,13 @@ if not os.path.exists(extract_dir) or not os.path.isdir(extract_dir):
 yes_100_flag = color.input("skip 100 score automatically? ([y]/n): ", color.blue)
 yes_100_flag = False if yes_100_flag != "" and yes_100_flag.lower()[0] == "n" else True
 print(yes_100_flag)
-whole_flag = color.input("use whole files? ([y]/n): ", color.blue)
+whole_flag = color.input("copy all files together (if one file depend another)? ([y]/n): ", color.blue)
 whole_flag = False if whole_flag != "" and whole_flag.lower()[0] == "n" else True
 print(whole_flag)
-some_flag = color.input("use some automatically? ([y]/n): ", color.blue)
-some_flag = False if some_flag != "" and some_flag.lower()[0] == "n" else True
-print(some_flag)
-vsc_flag = color.input("use vsc automatically? (y/[n]): ", color.blue)
+message_flag = color.input("use old error message automatically? ([y]/n): ", color.blue)
+message_flag = False if message_flag != "" and message_flag.lower()[0] == "n" else True
+print(message_flag)
+vsc_flag = color.input("open vscode when error automatically? (y/[n]): ", color.blue)
 vsc_flag = True if vsc_flag != "" and vsc_flag.lower()[0] == "y" else False
 print(vsc_flag)
 
@@ -60,7 +60,7 @@ testcase_dirs = list_sorted_dirs(testcase_path)
 
 # init JudgeProject
 jp = JudgeProject(testcase_path, temp_dir_path=temp_judge)
-some = Some(some_path)
+message = Message(message_path)
 
 
 # init excel output object
@@ -108,7 +108,7 @@ for student in all_dirs:
                 continue
 
             # give true score and reason (if not 100)
-            this_time_some_flag = some_flag
+            this_time_message_flag = message_flag
             this_time_vsc_flag = vsc_flag
             while True:
                 color.print(
@@ -117,30 +117,30 @@ for student in all_dirs:
                     color.purple
                 )
                 i = ""
-                if this_time_some_flag or this_time_vsc_flag:
-                    if this_time_some_flag:
-                        color.print("use some automatically", color.yellow)
-                        this_time_some_flag = False
+                if this_time_message_flag or this_time_vsc_flag:
+                    if this_time_message_flag:
+                        color.print("use error message automatically", color.yellow)
+                        this_time_message_flag = False
                         i = "s"
                     if this_time_vsc_flag:
-                        color.print("use vsc automatically", color.yellow)
+                        color.print("open vscode automatically", color.yellow)
                         this_time_vsc_flag = False
                         jp.show_in_vscode()
                 else:
                     color.print(
-                        "input: num -> give score / str -> give comment / s -> some / . -> show python code / ; -> judge again / q -> quit",
+                        "input: num -> give score / str -> give comment / m -> message / . -> show python code / ; -> judge again / q -> quit",
                         color.yellow
                     )
                     i = color.input("num / str / s / . / ; / q : ", color.yellow)
                 if i == "q":
                     break
-                elif i == "s":
-                    some.read()
-                    normal_list = some.result.get("normal", [])
-                    question_list = some.result.get(question_name, [])
+                elif i == "m":
+                    message.read()
+                    normal_list = message.result.get("normal", [])
+                    question_list = message.result.get(question_name, [])
                     result_list = normal_list + question_list
                     if len(result_list) == 0:
-                        color.print("some is empty", color.red)
+                        color.print("message file is empty", color.red)
                     else:
                         tmp_sq1 = select_from_list(result_list, cols=1); print()
                         sq[1] = tmp_sq1 if tmp_sq1 is not None else sq[1]
@@ -154,9 +154,9 @@ for student in all_dirs:
                     pass
                 else:
                     sq[1] = i
-                    some.read()
-                    some.add(question_name, i)
-                    some.dump()
+                    message.read()
+                    message.add(question_name, i)
+                    message.dump()
 
         # end of a student, check if need to retry
         color.print(f"[{num}] {student}:\n{student_score}", color.blue)

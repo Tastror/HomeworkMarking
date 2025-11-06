@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-class Some:
+class Message:
     def __init__(self, path: str | Path):
         self.path = path
         self.result = dict()
@@ -47,8 +47,8 @@ class Some:
                     f.write(f"{line}\n")
 
 if __name__ == '__main__':
-    some = Some('some')
-    result = some.read()
+    message = Message('mes')
+    result = message.read()
     print(result)
-    some.add('new_key', 'new_value')
-    some.dump()
+    message.add('new_key', 'new_value')
+    message.dump()

@@ -110,15 +110,17 @@ for student in all_dirs:
                 color.print(f"{identify_str} rough score 100 (skip automatically)", color.purple)
                 continue
 
-            message.read()
-            normal_list = message.result.get("normal", [])
-            question_list = message.result.get(question_name, [])
-            result_list = normal_list + question_list
-
             # give true score and reason (if not 100)
             this_time_message_flag = message_flag
             this_time_vsc_flag = vsc_flag
             while True:
+
+                # update upon each input
+                message.read()
+                normal_list = message.result.get("normal", [])
+                question_list = message.result.get(question_name, [])
+                result_list = normal_list + question_list
+
                 color.print(
                     f"give {identify_str} score: {sq[0]}\n"
                     f'give {identify_str} comment: {"(empty)" if sq[1] == "" else sq[1]}',
@@ -162,7 +164,7 @@ for student in all_dirs:
                     pass
                 else:
                     sq[1] = i
-                    message.read()
+                    message.read()  # 防止手动额外加了点东西被覆盖，做不到原子也尽量靠近一点
                     message.add(question_name, i)
                     message.dump()
 

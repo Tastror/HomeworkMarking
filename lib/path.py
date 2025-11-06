@@ -15,7 +15,7 @@ def very_stem(file_path) -> str:
         new_stem = Path(very_stem).stem
     return very_stem
 
-def list_sorted_daf(path) -> tuple[list[str], list[str]]:
+def list_sorted_daf(path, sort=True) -> tuple[list[str], list[str]]:
     """short for `list_sorted_dirs_and_files`
 
     name only (no preceding path)
@@ -23,22 +23,25 @@ def list_sorted_daf(path) -> tuple[list[str], list[str]]:
     return (dirs_list, files_list)
     """
     _, all_dirs, all_files = next(os.walk(path))
-    all_dirs.sort()
-    all_files.sort()
+    if sort:
+        all_dirs.sort()
+        all_files.sort()
     return all_dirs, all_files
 
-def list_sorted_dirs(path) -> list[str]:
+def list_sorted_dirs(path, sort=True) -> list[str]:
     """
     name only (no preceding path)
     """
     _, all_dirs, _ = next(os.walk(path))
-    all_dirs.sort()
+    if sort:
+        all_dirs.sort()
     return all_dirs
 
-def list_sorted_files(path) -> list[str]:
+def list_sorted_files(path, sort=True) -> list[str]:
     """
     name only (no preceding path)
     """
     _, _, all_files = next(os.walk(path))
-    all_files.sort()
+    if sort:
+        all_files.sort()
     return all_files

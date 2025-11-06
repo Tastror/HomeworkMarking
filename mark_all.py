@@ -5,6 +5,7 @@ import re
 from pathlib import Path
 
 import lib.color as color
+import lib.constant as constant
 from lib.judge import JudgeProject
 from lib.excel import ExcelIO
 from lib.path import list_sorted_dirs
@@ -14,21 +15,21 @@ from lib.some import Some
 
 
 # input 1/3
-dirs = list_sorted_dirs("./")
-dirs = [i for i in dirs if i not in ["tmp", "lib", "more_diff", ".git", ".vscode", ".idea"]]
+dirs = list_sorted_dirs("./", sort=False)
+dirs = [i for i in dirs if i not in constant.ROOT_DIR_NOT_READ]
 dirs.sort()
 color.print(f"choose the project: ", color.blue)
 project_name = select_from_list(dirs)
-color.print(f"\nchoosen: {project_name}", color.green)
+color.print(f"\nchosen: {project_name}", color.green)
 
 
 # input files
-testcase_path = Path(f"./{project_name}/testcase")
+testcase_path = Path(f"./{project_name}/{constant.TESTCASE_DIR}/")
 some_path = testcase_path / "some"
-extract_dir = Path(f"./{project_name}/extract/")
+extract_dir = Path(f"./{project_name}/{constant.EXTRACT_DIR}/")
 # files to generate / write
-result_xlsx = Path(f"./{project_name}/result.xlsx")
-temp_judge = Path(f"./tmp/{project_name}/judge/")
+result_xlsx = Path(f"./{project_name}/{constant.RESULT_EXCEL}")
+temp_judge = Path(f"./{constant.TEMP_DIR}/{project_name}/judge/")
 
 
 # no file

@@ -7,6 +7,7 @@ import shutil
 from pathlib import Path
 
 import lib.color as color
+import lib.constant as constant
 from lib.path import list_sorted_dirs, list_sorted_files, list_sorted_daf
 from lib.extract import extract_single_file
 from lib.pattern import NAME_SPLIT_PATTERN, STUDENT_ID_NAME_PATTERN
@@ -15,21 +16,21 @@ from lib.choose import select_from_list
 
 
 # project
-dirs = list_sorted_dirs("./")
-dirs = [i for i in dirs if i not in ["tmp", "lib", "more_diff", ".git", ".vscode", ".idea"]]
+dirs = list_sorted_dirs("./", sort=False)
+dirs = [i for i in dirs if i not in constant.ROOT_DIR_NOT_READ]
 dirs.sort()
 color.print(f"choose the project: ", color.blue)
 project_name = select_from_list(dirs)
-color.print(f"\nchoosen: {project_name}", color.green)
+color.print(f"\nchosen: {project_name}", color.green)
 
 
 # input files
 flag = "dir"
-project_file = Path(f"./{project_name}/submissions/")
-project_zip_file = Path(f"./{project_name}/submissions.zip")
+project_file = Path(f"./{project_name}/{constant.SUBMISSION_DIR}/")
+project_zip_file = Path(f"./{project_name}/{constant.SUBMISSION_ZIP}")
 # files to generate / write
-extract_dir = Path(f"./{project_name}/extract/")
-error_output = Path(f"./{project_name}/error.txt")
+extract_dir = Path(f"./{project_name}/{constant.EXTRACT_DIR}/")
+error_output = Path(f"./{project_name}/{constant.ERROR_FILE}")
 
 
 # no file
@@ -58,7 +59,7 @@ if os.path.exists(error_output): os.remove(error_output)
 
 
 # not used
-not_used_dirs_or_files = [".git", ".vscode", ".idea", "__pycache__", "__MACOSX", "Thumbs.db", ".DS_Store"]
+not_used_dirs_or_files = constant.DATA_NOT_USED_IN_MARK
 
 
 # extract all

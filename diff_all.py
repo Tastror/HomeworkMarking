@@ -6,26 +6,27 @@ import difflib
 from pathlib import Path
 
 import lib.color as color
+import lib.constant as constant
 from lib.path import very_stem, list_sorted_files, list_sorted_dirs
 from lib.excel import ExcelIO
 from lib.choose import select_from_list
 
 
 # project
-dirs = list_sorted_dirs("./")
-dirs = [i for i in dirs if i not in ["tmp", "lib", "more_diff", ".git", ".vscode", ".idea"]]
+dirs = list_sorted_dirs("./", sort=False)
+dirs = [i for i in dirs if i not in constant.ROOT_DIR_NOT_READ]
 dirs.sort()
 color.print(f"choose the project: ", color.blue)
 project_name = select_from_list(dirs)
-color.print(f"\nchoosen: {project_name}", color.green)
+color.print(f"\nchosen: {project_name}", color.green)
 
 
 # input files
-extract_dir = Path.cwd() / Path(f"./{project_name}/extract/")
-more_dir = Path.cwd() / Path(f"./more_diff/")
+extract_dir = Path.cwd() / Path(f"./{project_name}/{constant.EXTRACT_DIR}/")
+more_dir = Path.cwd() / Path(f"./{constant.MORE_DIFF_DIR}/")
 # files to generate / write
-result_xlsx = Path.cwd() / Path(f"./{project_name}/diff.xlsx")
-result_count_xlsx = Path.cwd() / Path(f"./{project_name}/diff-count.xlsx")
+result_xlsx = Path.cwd() / Path(f"./{project_name}/{constant.DIFF_EXCEL}")
+result_count_xlsx = Path.cwd() / Path(f"./{project_name}/{constant.DIFF_COUNT_EXCEL}")
 
 
 # no file

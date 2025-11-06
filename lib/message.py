@@ -32,7 +32,8 @@ class Message:
     def add(self, name, value):
         if name not in self.result:
             self.result[name] = []
-        self.result[name].append(value)
+        if value not in self.result[name]:
+            self.result[name].append(value)
 
     def dump(self):
         start = True

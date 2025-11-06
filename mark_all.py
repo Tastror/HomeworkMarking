@@ -110,6 +110,11 @@ for student in all_dirs:
                 color.print(f"{identify_str} rough score 100 (skip automatically)", color.purple)
                 continue
 
+            message.read()
+            normal_list = message.result.get("normal", [])
+            question_list = message.result.get(question_name, [])
+            result_list = normal_list + question_list
+
             # give true score and reason (if not 100)
             this_time_message_flag = message_flag
             this_time_vsc_flag = vsc_flag
@@ -134,14 +139,14 @@ for student in all_dirs:
                         "input: num -> give score / str -> give comment / m -> message / . -> show python code / ; -> judge again / q -> quit",
                         color.yellow
                     )
-                    i = color.input("num / str / s / . / ; / q : ", color.yellow)
+                    i = color.input(
+                        "num / str / m / . / ; / q : ",
+                        color.yellow,
+                        complete_list=result_list
+                    )
                 if i == "q":
                     break
                 elif i == "m":
-                    message.read()
-                    normal_list = message.result.get("normal", [])
-                    question_list = message.result.get(question_name, [])
-                    result_list = normal_list + question_list
                     if len(result_list) == 0:
                         color.print("message file is empty", color.red)
                     else:

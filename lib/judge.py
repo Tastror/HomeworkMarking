@@ -1,5 +1,6 @@
 import os
 import re
+import time
 import shutil
 import subprocess
 from pathlib import Path
@@ -17,6 +18,16 @@ SingleTestcase = TypedDict(
         'out': Optional[str],
     }
 )
+
+def safe_copy_file(a, b):
+    while True:
+        try:
+            shutil.copyfile(a, b)
+            break
+        except PermissionError as e:
+            color.print(f"PermissionError: {e}", color.red)
+            color.print("try again")
+            time.sleep(0.5)
 
 class JudgeProject:
 
@@ -153,7 +164,7 @@ class JudgeProject:
                             return 0
                         elif ready == "ready":
                             color.print("continue")
-                            shutil.copyfile(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
+                            safe_copy_file(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
                             break
 
         shutil.rmtree(self.temp_dir_path, ignore_errors=True)
@@ -162,10 +173,10 @@ class JudgeProject:
         if whole_files:
             filenames = list_sorted_files(self.project_input_dir_path)
             for i in filenames:
-                shutil.copyfile(self.project_input_dir_path / i, self.temp_dir_path / i)
+                safe_copy_file(self.project_input_dir_path / i, self.temp_dir_path / i)
                 get_rid_of_dangerous_code(self.temp_dir_path / i)
         else:
-            shutil.copyfile(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
+            safe_copy_file(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
             get_rid_of_dangerous_code(self.temp_dir_path / self.next_question_filename)
 
         count, right = 0, 0
@@ -176,7 +187,7 @@ class JudgeProject:
             if testcase_data["type"] == "py":
                 if self.__judge_py(name): right += 1
                 # refresh file
-                shutil.copyfile(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
+                safe_copy_file(self.project_input_dir_path / self.next_question_filename, self.temp_dir_path / self.next_question_filename)
                 count += 1
             # use for normal input & output
             elif testcase_data["type"] == "text":

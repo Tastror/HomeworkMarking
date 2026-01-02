@@ -252,8 +252,15 @@ class JudgeProject:
         assert(testcase_data["py"] is not None)
 
         # append testdata at the end
-        with open(file_to_judge, 'a+') as f:
-            f.write('\n' + testcase_data["py"])
+        while True:
+            try:
+                with open(file_to_judge, 'a+') as f:
+                    f.write('\n' + testcase_data["py"])
+                    break
+            except PermissionError as e:
+                color.print(f"PermissionError: {e}", color.red)
+                color.print("try again")
+                time.sleep(0.5)
 
         # run and get error only (assertion error)
         # p = subprocess.Popen(['python', file_to_judge], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
